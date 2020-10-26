@@ -29,19 +29,6 @@ public class UserController {
         return "index";
     }
 
-//    /**
-//     * 预生成订单详情页面
-//     */
-//    @RequestMapping("purchaseProposalItems")
-//    public String purchaseProposalItems(Model model, HttpServletRequest req) {
-//        model.addAttribute("wsId", SqlLikeUitl.isBank(req,"wsId"));
-//        model.addAttribute("deliveryDate", SqlLikeUitl.isBank(req,"deliveryDate"));
-//        model.addAttribute("wsName", SqlLikeUitl.isBank(req,"wsName"));
-//        model.addAttribute("consigneeId", SqlLikeUitl.isBank(req,"consigneeId"));
-//        model.addAttribute("wsRemark", SqlLikeUitl.isBank(req,"wsRemark"));
-//        return "purchaseProposalItems-list";
-//    }
-
     @RequestMapping("/login")
     public String login() {
         return "login";
@@ -51,7 +38,7 @@ public class UserController {
      * 管理员登录
      */
     @RequestMapping(value="/userLogin",produces = "application/json; charset=utf-8")
-    public String userLogin(@RequestBody LoginParam info) {
+    public Map<String, Object> userLogin(@RequestBody LoginParam info) {
         return userService.userLogin(info);
     }
 

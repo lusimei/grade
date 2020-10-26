@@ -27,13 +27,15 @@
         UPDATE_TIME
     </sql>
 
-    <select id="selectById" resultMap="BaseResultMap" >
+    <select id="selectStudentsInfo" resultMap="BaseResultMap" >
         SELECT
           <include refid="Base_Column_List" />
         FROM
-          KITCHEN_ACCOUNTS
+          grade_students
         WHERE
-          ACCOUNT_ID = #{accountId,jdbcType=INTEGER}
+          ACCOUNT_NAME = #{accountName}
+        AND
+          ACCOUNT_PASSWORD = #{accountPassword}
     </select>
 
     <!--<select id="selectByPrimaryKey" resultMap="BaseResultMap">-->

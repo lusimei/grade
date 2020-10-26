@@ -1,13 +1,12 @@
 package com.school.grade.mapper;
 
+import com.school.grade.entity.GradeTeachers;
+import com.school.grade.entity.LoginParam;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 @Mapper
 public interface GradeTeachersMapper {
 
-    int deleteByPrimaryKey(Integer accountId);
+    GradeTeachers selectTeacherInfo(LoginParam info);
 
 }

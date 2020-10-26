@@ -1,8 +1,17 @@
 package com.school.grade.service.serviceImpl;
 
+import com.school.grade.entity.GradeStudents;
+import com.school.grade.entity.GradeTeachers;
 import com.school.grade.entity.LoginParam;
+import com.school.grade.mapper.GradeStudentsMapper;
+import com.school.grade.mapper.GradeTeachersMapper;
 import com.school.grade.service.UserService;
+import com.school.grade.utils.MD5;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author weston
@@ -10,71 +19,34 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserServiceImpl implements UserService {
-//	@Autowired
-//	private GradeTeachersMapper kitchenAccountsMapper;
-//	@Autowired
-//	private KitchenPermissionMapper kitchenPermissionMapper;
-//	@Autowired
-//	private KitchenRolePemissionMapper kitchenRolePemissionMapper;
-//	@Autowired
-//	private GradeStudentsMapper clerkMapper;
-
-//	@Override
-//	public Map<String, Object> SeleUserById(HttpServletRequest req, HttpServletResponse res) {
-//		Map<String, Object> retobj = new HashMap<String, Object>();
-//		logger.info("SeleUserById=====>Begin");
-//		/**
-//		 * 帐号ID
-//		 */
-//		Integer accountId = null;
-//		if (SqlLikeUitl.isBank(req, "accountId") != null) {
-//			accountId = Integer.parseInt(SqlLikeUitl.isBank(req, "accountId"));
-//		}
-//		if (accountId != null) {
-//			GradeStudents pcwAcc = kitchenAccountsMapper.selectById(accountId);
-//			if (pcwAcc != null && pcwAcc.getClerkId() != null) {
-//				GradeTeachers pcwClerk = clerkMapper.selectByPrimaryKey(pcwAcc.getClerkId());
-//				pcwClerk.setClerkPhoto(Tomcat.getOrgUrl(req) + pcwClerk.getClerkPhoto());
-//				retobj.put("pcwAcc", pcwAcc);
-//				retobj.put("pcwClerk", pcwClerk);
-//				retobj.put("code", "1");
-//				retobj.put("msg", "OK");
-//			} else {
-//				retobj.put("code", "1");
-//				retobj.put("msg", "AccountId is miss!");
-//			}
-//		} else {
-//			retobj.put("code", "1");
-//			retobj.put("msg", "AccountId is miss!");
-//		}
-//		logger.info("SeleUserById=====>Finish");
-//		return retobj;
-//	}
-//
-//	@Override
-//	public String SeleUser(HttpServletRequest req, HttpServletResponse res, Model model) {
-//		Integer accountId = null;
-//		if (SqlLikeUitl.isBank(req, "accountId") != null) {
-//			accountId = Integer.parseInt(SqlLikeUitl.isBank(req, "accountId"));
-//		}
-//		if (accountId != null) {
-//
-//			GradeStudents pcwAcc = kitchenAccountsMapper.selectById(accountId);
-//
-//			if (pcwAcc != null && pcwAcc.getClerkId() != null) {
-//				GradeTeachers pcwClerk = clerkMapper.selectByPrimaryKey(pcwAcc.getClerkId());
-//				pcwClerk.setClerkPhoto(Tomcat.getOrgUrl(req) + pcwClerk.getClerkPhoto());
-//				model.addAttribute("pcwAcc", pcwAcc);
-//				model.addAttribute("pcwClerk", pcwClerk);
-//			}
-//		}
-//		logger.info("SeleUserById=====>Finish");
-//		return "user-update";
-//	}
-
+	@Autowired
+	private GradeTeachersMapper gradeTeachersMapper;
+	@Autowired
+	private GradeStudentsMapper gradeStudentsMapper;
 
 	@Override
-	public String userLogin(LoginParam info) {
-		return null;
+	public Map<String, Object> userLogin(LoginParam info) {
+		Map<String, Object> retobj = new HashMap<String, Object>();
+		info.setAccountPassword(MD5.getMD5Str(info.getAccountPassword()));
+		if(info.getLoginType() == 1){
+			GradeStudents students = gradeStudentsMapper.selectStudentsInfo(info);
+			if(students != null){
+				retobj.put("info", students);
+				retobj.put("code",1);
+			}else{
+				retobj.put("code",500);
+				retobj.put("msg", "帐号或者密码错误");
+			}
+		}else{
+			GradeTeachers teachers = gradeTeachersMapper.selectTeacherInfo(info);
+			if(teachers != null){
+				retobj.put("info", teachers);
+				retobj.put("code",1);
+			}else{
+				retobj.put("code",500);
+				retobj.put("msg", "帐号或者密码错误");
+			}
+		}
+		return retobj;
 	}
 }
