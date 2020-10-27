@@ -9,10 +9,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginParam{
-
-    private Integer loginType;
-
-    private String accountName;
-
+    /**
+     * 是否记住密码 【0否，1是】
+     */
+    private Integer remember;
+    /**
+     * 用户名
+     */
+    private String accountNumber;
+    /**
+     * 密码
+     */
     private String accountPassword;
 }

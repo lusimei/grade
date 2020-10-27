@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 
 @Controller
-@RequestMapping("/admin")
 public class AdminController {
 
     @RequestMapping("/index")
@@ -25,6 +24,11 @@ public class AdminController {
     @RequestMapping("/login")
     public String login() {
         return "login";
+    }
+
+    @RequestMapping("/welcome")
+    public String welcome() {
+        return "welcome";
     }
 
 }

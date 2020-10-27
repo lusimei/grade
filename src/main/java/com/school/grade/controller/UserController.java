@@ -24,22 +24,23 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping("/index")
-    public String index() {
-        return "index";
-    }
-
-    @RequestMapping("/login")
-    public String login() {
-        return "login";
-    }
-
     /**
      * 管理员登录
      */
     @RequestMapping(value="/userLogin",produces = "application/json; charset=utf-8")
-    public Map<String, Object> userLogin(@RequestBody LoginParam info) {
-        return userService.userLogin(info);
+    @ResponseBody
+    public Map<String, Object> userLogin(@RequestBody LoginParam info,HttpServletRequest request,
+                            HttpServletResponse response, Model model) {
+        return userService.userLogin(info,request,response,model);
+    }
+
+    /**
+     * 根据登录账号获取用户信息与权限
+     */
+    @RequestMapping(value = "getUserInfo", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> getUserInfo(@RequestParam("account") String account,HttpServletResponse response) {
+        return userService.getUserInfo(account, response);
     }
 
 }

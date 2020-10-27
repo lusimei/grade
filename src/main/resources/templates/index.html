@@ -1,0 +1,250 @@
+<!--_meta 作为公共模版分离出去-->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" th:href="@{/bootstrap/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/dist/css/AdminLTE.min.css}">
+    <link rel="icon" th:href="@{/lib/bitbug_favicon.ico}" type="img/x-ico"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui/css/H-ui.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/H-ui.admin.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/skin/default/skin.css}" id="skin"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/style.css}"/>
+    <!--[if IE 6]>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <!--/meta 作为公共模版分离出去-->
+    <title>学生平时表现评分管理系統</title>
+    <style type="text/css">
+        #footer {
+            padding-left: 10px;
+            height: 40px;
+            line-height: 50px;
+            position: fixed;
+            bottom: 0;
+            text-align: center;
+            font-family: Arial;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        dl{
+            display: none;
+        }
+        .fonts{
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+<!--_header 作为公共模版分离出去-->
+<header class="navbar-wrapper">
+    <div class="navbar navbar-fixed-top">
+        <div class="container-fluid cl">
+            <a class="logo navbar-logo f-l mr-10 hidden-xs" href="index" style="font-size: 22px">学生平时表现评分管理系統</a>
+            <a class="logo navbar-logo-m f-l mr-10 visible-xs" href="index" style="font-size: 22px">学生平时表现评分管理系統</a>
+            <span class="logo navbar-slogan f-l mr-10 hidden-xs" style="font-size: 22px">V1.0</span>
+            <a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs"
+               href="javascript:;">&#xe667;
+            </a>
+            <nav id="Hui-userbar" class="nav navbar-nav navbar-userbar hidden-xs">
+                <input id="clerkNumber" hidden="hidden"/>
+                <ul class="cl">
+                    <li><span id="jobTitle"></span></li>
+                    <li class="dropDown dropDown_hover">
+                        <a href="#" class="dropDown_A"><span id="adminName"></span>
+                            <i class="Hui-iconfont">&#xe6d5;</i>
+                        </a>
+                        <ul class="dropDown-menu menu radius box-shadow">
+                            <li><a href="#">個人資訊</a></li>
+                            <li><a onClick="editPassword()">更改密碼</a></li>
+                            <li><a onclick="adminOff()">切換帳戶</a></li>
+                            <li><a onclick="adminOff()">退出</a></li>
+                        </ul>
+                    </li>
+                    <!--<li id="Hui-msg"><a href="#" title="消息"><span
+                            class="badge badge-danger">0</span><i class="Hui-iconfont"
+                            style="font-size: 18px">&#xe68a;</i></a></li> -->
+                    <!--  <li id="Hui-skin" class="dropDown right dropDown_hover"><a
+                              href="javascript:;" class="dropDown_A" title="換膚"><i
+                              class="Hui-iconfont" style="font-size: 18px">&#xe62a;</i></a>
+                          <ul class="dropDown-menu menu radius box-shadow">
+                              <li><a href="javascript:;" data-val="default"
+                                     title="默認（黑色）">默認（黑色）</a></li>
+                              <li><a href="javascript:;" data-val="blue" title="藍色">藍色</a></li>
+                              <li><a href="javascript:;" data-val="green" title="綠色">綠色</a></li>
+                              <li><a href="javascript:;" data-val="red" title="紅色">紅色</a></li>
+                              <li><a href="javascript:;" data-val="yellow" title="黃色">黃色</a></li>
+                              <li><a href="javascript:;" data-val="orange" title="橙色">橙色</a></li>
+                          </ul>
+                      </li>-->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+<!--/_header 作为公共模版分离出去-->
+
+<!--_menu 作为公共模版分离出去-->
+<aside class="Hui-aside">
+    <div class="bgleft">
+        <div class="menu_dropdown bk_2 fonts">
+            <dl id="kitchen-purchase">
+                <dt>
+                    <i class="Hui-iconfont">&#xe670;</i>&nbsp;採購管理
+                    <i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i>
+                </dt>
+                <dd>
+                    <ul>
+                        <li><a data-href="purchaseResponse-list" data-title="採購需求"
+                               href="javascript:void(0)" style="font-size: 18px;">1.採購需求</a></li>
+                        <li><a data-href="purchasePlan-list" data-title="採購計劃"
+                               href="javascript:void(0)" style="font-size: 18px;">2.採購計劃</a></li>
+                        <li><a data-href="purchaseSupplier-list" data-title="採購定價"
+                               href="javascript:void(0)" style="font-size: 18px;">3.採購定價</a></li>
+                        <li><a data-href="purchaseProposal-list" data-title="採購方案"
+                               href="javascript:void(0)" style="font-size: 18px;">4.採購方案</a></li>
+                        <li><a data-href="purchaseOrder-list" data-title="採購訂單"
+                               href="javascript:void(0)" style="font-size: 18px;">5.採購訂單</a></li>
+                        <li><a data-href="purchaseCash-list" data-title="自購訂單"
+                               href="javascript:void(0)" style="font-size: 18px;">6.自購訂單</a></li>
+                    </ul>
+                </dd>
+            </dl>
+
+            <dl id="kitchen-execute">
+                <dt>
+                    <i class="Hui-iconfont">&#xe636;</i>&nbsp;執行餐單<i
+                        class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i>
+                </dt>
+                <dd>
+                    <ul>
+                        <li><a data-href="executePeople-list" data-title="執行餐單人數"
+                               href="javascript:void(0)" style="font-size: 18px;">執行餐單人數</a></li>
+                        <li><a data-href="execute-list" data-title="每周執行餐單"
+                               href="javascript:void(0)" style="font-size: 18px;">每周執行餐單</a></li>
+                    </ul>
+                </dd>
+            </dl>
+
+            <dl id="kitchen-menu">
+                <dt>
+                    <i class="Hui-iconfont">&#xe636;</i>&nbsp;循環餐單<i
+                        class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i>
+                </dt>
+                <dd>
+                    <ul>
+                        <li><a data-href="menu-list" data-title="循環餐單"
+                               href="javascript:void(0)" style="font-size: 18px;">循環餐單</a></li>
+                        <li><a data-href="menuType-list" data-title="循環餐單名稱"
+                               href="javascript:void(0)" style="font-size: 18px;">循環餐單名稱</a></li>
+                    </ul>
+                </dd>
+            </dl>
+        </div>
+    </div>
+</aside>
+<section class="Hui-article-box">
+    <div id="Hui-tabNav" class="Hui-tabNav hidden-xs">
+        <div class="Hui-tabNav-wp">
+            <ul id="min_title_list" class="acrossTab cl">
+                <li class="active">
+                    <span title="我的桌面" th:data-href="welcome.html">我的桌面</span> <em></em>
+                </li>
+            </ul>
+        </div>
+        <div class="Hui-tabNav-more btn-group">
+            <a id="js-tabNav-prev" class="btn radius btn-default size-S"
+               href="javascript:;"><i class="Hui-iconfont">&#xe6d4;</i></a><a
+                id="js-tabNav-next" class="btn radius btn-default size-S"
+                href="javascript:;"><i class="Hui-iconfont">&#xe6d7;</i></a>
+        </div>
+    </div>
+    <div id="iframe_box" class="Hui-article">
+        <div class="show_iframe">
+            <div style="display: none" class="loading"></div>
+            <iframe scrolling="yes" frameborder="0" th:src="@{/welcome}"></iframe>
+        </div>
+    </div>
+</section>
+
+<div class="contextMenu" id="Huiadminmenu" style="display: none;">
+    <ul>
+        <li id="closethis">關閉當前</li>
+        <li id="closeall">關閉全部</li>
+    </ul>
+</div>
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" th:src="@{/lib/jquery/1.9.1/jquery.min.js}"></script>
+<script type="text/javascript" th:src="@{/lib/layer/2.4/layer.js}"></script>
+<script type="text/javascript" th:src="@{/h-ui/js/H-ui.js}"></script>
+<script type="text/javascript" th:src="@{/h-ui.admin/js/H-ui.admin.page.js}"></script>
+<script type="text/javascript" th:src="@{/lib/jquery.contextmenu/jquery.contextmenu.r2.js}"></script>
+<!--/_footer /作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script>
+    $(document).ready(function () {
+        var account = $.cookie("accountNumber");
+        if (account != null) {
+            var obj = {
+                "account": account
+            }
+            $.postAjax("/user/AdminById", obj, function (date) {
+                if (date.code == "1") {
+                    $("#clerkNumber").val(date.account.clerkNumber);
+                    $("#adminName").html(date.account.clerkName);
+                    $("#jobTitle").html(date.account.jobTitle);
+                    for (var int = 0; int < date.RetChilinPermissions.length; int++) {
+                        if (date.RetChilinPermissions[int].cpKey == "ADMIN") {
+                            if(document.getElementById(date.RetChilinPermissions[int].cpName)){
+                                document.getElementById(date.RetChilinPermissions[int].cpName).style.display = "block";
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            location.href = "login";
+        }
+    });
+
+    //修改密碼
+    function editPassword() {
+        layer_show('修改密碼', '../web/password-edit', 750, 420);
+    }
+
+    window.addEventListener('popstate', function () {
+        window.location.reload();
+    });
+
+    function delCookie(key) {
+        var date = new Date();
+        date.setTime(date.getTime() - 1);
+        var delValue = getCookie(key);
+        if (!!delValue) {
+            document.cookie = key + '=' + delValue + ';expires=' + date.toGMTString();
+        }
+    }
+
+    //退出
+    function adminOff() {
+        //清除cookie 跳越網頁面
+        delCookie("accountName");
+        delCookie("password");
+        location.href = "login";
+    }
+</script>
+</body>
+</html>

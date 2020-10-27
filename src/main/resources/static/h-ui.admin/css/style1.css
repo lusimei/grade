@@ -1,0 +1,90 @@
+/* CSS Document */
+body {
+  font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+  background-color: #d6ebf3;
+  color: #1E68DD;
+}
+.container {
+  margin: 5em auto;
+ filter: progid:DXImageTransform.Microsoft.Shadow(color='#6db6cb', Direction=135, Strength=5);/*for ie6,7,8*/
+  -moz-box-shadow: 0 0 15px #6db6cb;
+  -webkit-box-shadow: 0 0 15px #6db6cb;
+  box-shadow: 0 0 15px #6db6cb;
+}
+.container img {
+  display: block;
+  margin: 0 auto;
+}
+.top-header, .page-footer {
+  height: 8em;
+  background: rgb(122, 206, 255);
+  background: -moz-linear-gradient(270deg, rgb(122, 206, 255) 0%, rgb(237, 250, 255) 100%);
+  background: -webkit-linear-gradient(270deg, rgb(122, 206, 255) 0%, rgb(237, 250, 255) 100%);
+  background: -o-linear-gradient(270deg, rgb(122, 206, 255) 0%, rgb(237, 250, 255) 100%);
+  background: -ms-linear-gradient(270deg, rgb(122, 206, 255) 0%, rgb(237, 250, 255) 100%);
+  background: linear-gradient(0deg, rgb(122, 206, 255) 0%, rgb(237, 250, 255) 100%);
+  border-bottom: double #8BD3F1 6px;
+  text-align: center;
+  letter-spacing: 3px;
+}
+.top-header .title {
+  padding-top: 1em;
+  font-size: 2em;
+}
+.content {
+  padding-top: 5em;
+  padding-bottom: 5em;
+  padding-left: 3em;
+  padding-right: 3em;
+  background: rgb(255, 255, 188);
+  background: -moz-linear-gradient(270deg, rgb(255, 255, 188) 0%, rgb(237, 250, 255) 80%);
+  background: -webkit-linear-gradient(270deg, rgb(255, 255, 188) 0%, rgb(237, 250, 255) 80%);
+  background: -o-linear-gradient(270deg, rgb(255, 255, 188) 0%, rgb(237, 250, 255) 80%);
+  background: -ms-linear-gradient(270deg, rgb(255, 255, 188) 0%, rgb(237, 250, 255) 80%);
+  background: linear-gradient(0deg, rgb(255, 255, 188) 0%, rgb(237, 250, 255) 80%);
+  border-bottom: double #8BD3F1 6px;
+}
+.page-footer {
+  height: 5em; 
+  border-bottom: none; 
+}
+
+@media (max-width:1200px) {
+.content {
+  padding-top: 3em;
+  padding-bottom: 3em;
+}
+.content img {
+  width: 100%
+}
+}
+@media (max-width:960px) {
+.container {
+  margin: 0 auto;
+}
+.content {
+  padding-top: 3em;
+  padding-bottom: 3em;
+}
+.content img {
+  width: 70%
+}
+}
+
+@media (max-width:768px) {
+.container {
+  margin: 0 auto;
+}
+.top-header .title {
+  padding-top: 1.5em;
+  font-size: 1.6em;
+}
+.content {
+  padding: 0;
+}
+.content img {
+  width: 70%
+}
+}
+
+
