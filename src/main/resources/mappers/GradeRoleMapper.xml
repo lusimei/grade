@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.school.grade.mapper.GradeRoleMapper">
+    <resultMap id="BaseResultMap" type="com.school.grade.entity.GradeRole">
+        <id column="GR_ID" property="grId"/>
+        <result column="GR_NAME" property="grName"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        GR_ID,
+        GR_NAME
+    </sql>
+
+    <select id="selectGradeRole" resultMap="BaseResultMap" >
+        SELECT
+          <include refid="Base_Column_List" />
+        FROM
+          grade_role
+        WHERE
+          GR_ID = #{grId}
+    </select>
+</mapper>

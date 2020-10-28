@@ -31,4 +31,9 @@ public class AdminController {
         return "welcome";
     }
 
+    @RequestMapping("/password-edit")
+    public String passwordEdit() {
+        return "password-edit";
+    }
+
 }

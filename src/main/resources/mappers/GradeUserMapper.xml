@@ -51,6 +51,37 @@
           STATUS = 1
     </select>
 
+    <update id="updateGradeUserInfo">
+        UPDATE
+          grade_user
+        <set>
+            <if test="userName != null">
+                USER_NAME = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="accountNumber != null">
+                ACCOUNT_NUMBER = #{accountNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="accountPassword != null">
+                ACCOUNT_PASSWORD = #{accountPassword,jdbcType=VARCHAR},
+            </if>
+            <if test="accountType != null">
+                ACCOUNT_TYPE = #{accountType,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="userSex != null">
+                USER_SEX = #{userSex,jdbcType=VARCHAR},
+            </if>
+            <if test="userEmail != null">
+                USER_EMAIL = #{userEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="cellphone != null">
+                CELLPHONE = #{cellphone,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE USER_ID = #{userId}
+    </update>
 
     <!--<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">-->
         <!--DELETE FROM KITCHEN_ACCOUNTS-->
@@ -136,45 +167,4 @@
             <!--</if>-->
         <!--</trim>-->
     <!--</insert>-->
-
-    <!--<update id="updateByPrimaryKeySelective" parameterType="com.mieasy.kitchen.domain.KitchenAccounts">-->
-        <!--UPDATE KITCHEN_ACCOUNTS-->
-        <!--<set>-->
-            <!--<if test="clerkId != null">-->
-                <!--CLERK_ID = #{clerkId,jdbcType=INTEGER},-->
-            <!--</if>-->
-            <!--<if test="accountName != null">-->
-                <!--ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},-->
-            <!--</if>-->
-            <!--<if test="accountPassword != null">-->
-                <!--ACCOUNT_PASSWORD = #{accountPassword,jdbcType=VARCHAR},-->
-            <!--</if>-->
-            <!--<if test="accountType != null">-->
-                <!--ACCOUNT_TYPE = #{accountType,jdbcType=INTEGER},-->
-            <!--</if>-->
-            <!--<if test="accountStatus != null">-->
-                <!--ACCOUNT_STATUS = #{accountStatus,jdbcType=INTEGER},-->
-            <!--</if>-->
-            <!--<if test="accountRemark != null">-->
-                <!--ACCOUNT_REMARK = #{accountRemark,jdbcType=VARCHAR},-->
-            <!--</if>-->
-            <!--<if test="accountToken != null">-->
-                <!--ACCOUNT_TOKEN = #{accountToken,jdbcType=VARCHAR},-->
-            <!--</if>-->
-            <!--<if test="upTime != null">-->
-                <!--UP_TIME = #{upTime,jdbcType=TIMESTAMP},-->
-            <!--</if>-->
-            <!--<if test="createTime != null">-->
-                <!--CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},-->
-            <!--</if>-->
-            <!--<if test="accountResI != null">-->
-                <!--ACCOUNT_RES_I = #{accountResI,jdbcType=VARCHAR},-->
-            <!--</if>-->
-            <!--<if test="accountResX != null">-->
-                <!--ACCOUNT_RES_X = #{accountResX,jdbcType=VARCHAR},-->
-            <!--</if>-->
-        <!--</set>-->
-        <!--WHERE ACCOUNT_ID = #{accountId,jdbcType=INTEGER}-->
-    <!--</update>-->
-
 </mapper>

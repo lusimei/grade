@@ -1,5 +1,6 @@
 package com.school.grade.controller;
 import com.school.grade.entity.LoginParam;
+import com.school.grade.entity.UpdatePasswordParam;
 import com.school.grade.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,4 +44,12 @@ public class UserController {
         return userService.getUserInfo(account, response);
     }
 
+    /**
+     * 根据登录账号获取用户信息与权限
+     */
+    @RequestMapping(value = "updatePassword", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> updatePassword(@RequestBody UpdatePasswordParam param) {
+        return userService.updatePassword(param);
+    }
 }

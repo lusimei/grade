@@ -58,36 +58,20 @@
                href="javascript:;">&#xe667;
             </a>
             <nav id="Hui-userbar" class="nav navbar-nav navbar-userbar hidden-xs">
-                <input id="clerkNumber" hidden="hidden"/>
+                <input id="accountNumber" hidden="hidden"/>
                 <ul class="cl">
-                    <li><span id="jobTitle"></span></li>
+                    <li><span id="role"></span></li>
                     <li class="dropDown dropDown_hover">
-                        <a href="#" class="dropDown_A"><span id="adminName"></span>
+                        <a href="javascript:void(0)" class="dropDown_A"><span id="userName"></span>
                             <i class="Hui-iconfont">&#xe6d5;</i>
                         </a>
                         <ul class="dropDown-menu menu radius box-shadow">
-                            <li><a href="#">個人資訊</a></li>
+                            <li><a href="javascript:void(0)">個人資訊</a></li>
                             <li><a onClick="editPassword()">更改密碼</a></li>
                             <li><a onclick="adminOff()">切換帳戶</a></li>
                             <li><a onclick="adminOff()">退出</a></li>
                         </ul>
                     </li>
-                    <!--<li id="Hui-msg"><a href="#" title="消息"><span
-                            class="badge badge-danger">0</span><i class="Hui-iconfont"
-                            style="font-size: 18px">&#xe68a;</i></a></li> -->
-                    <!--  <li id="Hui-skin" class="dropDown right dropDown_hover"><a
-                              href="javascript:;" class="dropDown_A" title="換膚"><i
-                              class="Hui-iconfont" style="font-size: 18px">&#xe62a;</i></a>
-                          <ul class="dropDown-menu menu radius box-shadow">
-                              <li><a href="javascript:;" data-val="default"
-                                     title="默認（黑色）">默認（黑色）</a></li>
-                              <li><a href="javascript:;" data-val="blue" title="藍色">藍色</a></li>
-                              <li><a href="javascript:;" data-val="green" title="綠色">綠色</a></li>
-                              <li><a href="javascript:;" data-val="red" title="紅色">紅色</a></li>
-                              <li><a href="javascript:;" data-val="yellow" title="黃色">黃色</a></li>
-                              <li><a href="javascript:;" data-val="orange" title="橙色">橙色</a></li>
-                          </ul>
-                      </li>-->
                 </ul>
             </nav>
         </div>
@@ -99,7 +83,7 @@
 <aside class="Hui-aside">
     <div class="bgleft">
         <div class="menu_dropdown bk_2 fonts">
-            <dl id="kitchen-purchase">
+            <dl id="add-user">
                 <dt>
                     <i class="Hui-iconfont">&#xe670;</i>&nbsp;採購管理
                     <i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i>
@@ -121,8 +105,7 @@
                     </ul>
                 </dd>
             </dl>
-
-            <dl id="kitchen-execute">
+            <dl id="student-score">
                 <dt>
                     <i class="Hui-iconfont">&#xe636;</i>&nbsp;執行餐單<i
                         class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i>
@@ -136,8 +119,7 @@
                     </ul>
                 </dd>
             </dl>
-
-            <dl id="kitchen-menu">
+            <dl id="make-score">
                 <dt>
                     <i class="Hui-iconfont">&#xe636;</i>&nbsp;循環餐單<i
                         class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i>
@@ -198,19 +180,14 @@
     $(document).ready(function () {
         var account = $.cookie("accountNumber");
         if (account != null) {
-            var obj = {
-                "account": account
-            }
-            $.postAjax("/user/AdminById", obj, function (date) {
-                if (date.code == "1") {
-                    $("#clerkNumber").val(date.account.clerkNumber);
-                    $("#adminName").html(date.account.clerkName);
-                    $("#jobTitle").html(date.account.jobTitle);
-                    for (var int = 0; int < date.RetChilinPermissions.length; int++) {
-                        if (date.RetChilinPermissions[int].cpKey == "ADMIN") {
-                            if(document.getElementById(date.RetChilinPermissions[int].cpName)){
-                                document.getElementById(date.RetChilinPermissions[int].cpName).style.display = "block";
-                            }
+            $.postAjax("user/getUserInfo", {"account": account}, function (data) {
+                if (data.code == 1) {
+                    $("#accountNumber").val(data.userInfo.accountNumber);
+                    $("#userName").html(data.userInfo.userName);
+                    $("#role").html(data.role.grName);
+                    for (var i=0;i<data.permissions.length;i++) {
+                        if(document.getElementById(data.permissions[i].gpName)){
+                            document.getElementById(data.permissions[i].gpName).style.display = "block";
                         }
                     }
                 }
@@ -222,7 +199,7 @@
 
     //修改密碼
     function editPassword() {
-        layer_show('修改密碼', '../web/password-edit', 750, 420);
+        layer_show('修改密碼', 'password-edit', 750, 420);
     }
 
     window.addEventListener('popstate', function () {
@@ -241,7 +218,7 @@
     //退出
     function adminOff() {
         //清除cookie 跳越網頁面
-        delCookie("accountName");
+        delCookie("accountNumber");
         delCookie("password");
         location.href = "login";
     }

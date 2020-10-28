@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.school.grade.mapper.GradeRolePermissionMapper">
+    <resultMap id="BaseResultMap" type="com.school.grade.entity.GradeRolePermission">
+        <id column="GRP_ID" property="grpId"/>
+        <result column="GR_ID" property="grId"/>
+        <result column="GP_ID" property="gpId"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        GRP_ID,
+        GR_ID,
+        GP_ID
+    </sql>
+
+    <select id="selectGradeRolePermission" resultMap="BaseResultMap" >
+        SELECT
+          <include refid="Base_Column_List" />
+        FROM
+          grade_role_permission
+    </select>
+</mapper>

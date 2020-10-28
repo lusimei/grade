@@ -1,17 +1,25 @@
 package com.school.grade.service.serviceImpl;
+import com.school.grade.entity.GradePermission;
 import com.school.grade.entity.GradeUser;
 import com.school.grade.entity.LoginParam;
+import com.school.grade.entity.UpdatePasswordParam;
+import com.school.grade.mapper.GradePermissionMapper;
+import com.school.grade.mapper.GradeRoleMapper;
 import com.school.grade.mapper.GradeUserMapper;
 import com.school.grade.service.UserService;
 import com.school.grade.utils.MD5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +31,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private GradeUserMapper gradeUserMapper;
+
+    @Autowired
+    private GradePermissionMapper gradePermissionMapper;
+
+    @Autowired
+    private GradeRoleMapper gradeRoleMapper;
 
 	@Override
 	public Map<String, Object> userLogin(LoginParam info, HttpServletRequest request,
@@ -70,38 +84,45 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> result = new HashMap<String, Object>();
         GradeUser user = gradeUserMapper.selectGradeUserByAccount(account);
         if (user != null) {
-            Integer crId = null;
-//            try {
-//                crId = pac.getAccountType();
-//            } catch (Exception e) {
-//                retobj.put("code", "10009");
-//                retobj.put("msg", "Error in SQL");
-//            }
-//            List<KitchenPermission> cps = kitchenPermissionMapper.selectKitchenPermissionByCrId(crId);
-//            KitchenClerk clerk = clerkMapper.selectByPrimaryKey(pac.getClerkId());
-//            retobj.put("code", "1");
-//            retobj.put("msg", "OK");
-//            retobj.put("account", clerk);
-//            retobj.put("RetChilinPermissions", cps);
-//
-//            Cookie cookie1 = new Cookie("clerkId", clerk.getClerkId().toString());
-//            cookie1.setPath("/");
-//            cookie1.setMaxAge(Integer.MAX_VALUE);
-//            res.addCookie(cookie1);
-//
-//            Cookie cookie2 = null;
-//            try {
-//                cookie2 = new Cookie("clerkName", URLEncoder.encode(clerk.getClerkName(), "utf-8"));
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
-//            cookie2.setPath("/");
-//            cookie2.setMaxAge(Integer.MAX_VALUE);
-//            res.addCookie(cookie2);
+            List<GradePermission> gps = gradePermissionMapper.selectPermission(user.getAccountType());
+            result.put("code",1);
+            result.put("userInfo", user);
+            result.put("role",gradeRoleMapper.selectGradeRole(user.getAccountType()));
+            result.put("permissions", gps);
+
+            Cookie cookie1 = new Cookie("clerkId", user.getUserId().toString());
+            cookie1.setPath("/");
+            cookie1.setMaxAge(Integer.MAX_VALUE);
+            response.addCookie(cookie1);
+
+            Cookie cookie2 = null;
+            try {
+                cookie2 = new Cookie("clerkName", URLEncoder.encode(user.getUserName(), "utf-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            cookie2.setPath("/");
+            cookie2.setMaxAge(Integer.MAX_VALUE);
+            response.addCookie(cookie2);
         } else {
-//            retobj.put("code", "500");
+            result.put("code", "500");
         }
         return result;
     }
 
+    @Override
+    public Map<String, Object> updatePassword(UpdatePasswordParam param) {
+        Map<String, Object> retobj = new HashMap<String, Object>();
+        GradeUser user = gradeUserMapper.selectGradeUserByAccount(param.getAccountNumber());
+        if (MD5.getMD5Str(param.getOldPassword()).equals(user.getAccountPassword())) {
+            GradeUser gradeUser = new GradeUser();
+            gradeUser.setUserId(user.getUserId());
+            gradeUser.setAccountPassword(MD5.getMD5Str(param.getNewPassword()));
+            gradeUserMapper.updateGradeUserInfo(gradeUser);
+            retobj.put("code",1);
+        } else {
+            retobj.put("code",500);
+        }
+        return retobj;
+    }
 }

@@ -8,4 +8,6 @@ public interface GradeUserMapper {
     GradeUser selectGradeUser(LoginParam info);
 
     GradeUser selectGradeUserByAccount(String account);
+
+    int updateGradeUserInfo(GradeUser user);
 }
