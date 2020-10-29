@@ -1,8 +1,7 @@
 package com.school.grade.service.serviceImpl;
-import com.school.grade.entity.GradePermission;
-import com.school.grade.entity.GradeUser;
-import com.school.grade.entity.LoginParam;
-import com.school.grade.entity.UpdatePasswordParam;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.school.grade.entity.*;
 import com.school.grade.mapper.GradePermissionMapper;
 import com.school.grade.mapper.GradeRoleMapper;
 import com.school.grade.mapper.GradeUserMapper;
@@ -111,6 +110,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Map<String, Object> getGradeUser(Integer userId) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("code",1);
+        result.put("info",gradeUserMapper.selectGradeUserById(userId));
+        return result;
+    }
+
+    @Override
     public Map<String, Object> updatePassword(UpdatePasswordParam param) {
         Map<String, Object> retobj = new HashMap<String, Object>();
         GradeUser user = gradeUserMapper.selectGradeUserByAccount(param.getAccountNumber());
@@ -124,5 +131,53 @@ public class UserServiceImpl implements UserService {
             retobj.put("code",500);
         }
         return retobj;
+    }
+
+    @Override
+    public Map<String, Object> getUserList(GetUserListParam param) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        PageHelper.startPage(param.getCurrentPage(), param.getPageSize());
+        if(param.getUserName().length() > 0){
+            param.setUserName("%"+param.getUserName()+"%");
+        }
+        List<GradeUser> list = gradeUserMapper.selectGradeUserList(param);
+        PageInfo<GradeUser> page = new PageInfo<>(list);
+        result.put("code",1);
+        result.put("page",page);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> removeUser(Integer userId) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        gradeUserMapper.deleteGradeUser(userId);
+        result.put("code",1);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> addGradeUser(GradeUser user) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        if(user.getAccountPassword() != null && user.getAccountPassword().length() > 0){
+            user.setAccountPassword(MD5.getMD5Str(user.getAccountPassword()));
+        }else{
+            user.setAccountPassword(null);
+        }
+        gradeUserMapper.insertGradeUser(user);
+        result.put("code",1);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> updateGradeUser(GradeUser user) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        if(user.getAccountPassword() != null && user.getAccountPassword().length() > 0){
+            user.setAccountPassword(MD5.getMD5Str(user.getAccountPassword()));
+        }else{
+            user.setAccountPassword(null);
+        }
+        gradeUserMapper.updateGradeUserInfo(user);
+        result.put("code",1);
+        return result;
     }
 }

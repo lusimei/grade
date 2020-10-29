@@ -1,4 +1,6 @@
 package com.school.grade.controller;
+import com.school.grade.entity.GetUserListParam;
+import com.school.grade.entity.GradeUser;
 import com.school.grade.entity.LoginParam;
 import com.school.grade.entity.UpdatePasswordParam;
 import com.school.grade.service.UserService;
@@ -19,7 +21,7 @@ import java.util.Map;
  */
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("user")
 public class UserController {
 
     @Autowired
@@ -28,7 +30,7 @@ public class UserController {
     /**
      * 管理员登录
      */
-    @RequestMapping(value="/userLogin",produces = "application/json; charset=utf-8")
+    @RequestMapping(value="userLogin",produces = "application/json; charset=utf-8")
     @ResponseBody
     public Map<String, Object> userLogin(@RequestBody LoginParam info,HttpServletRequest request,
                             HttpServletResponse response, Model model) {
@@ -45,11 +47,57 @@ public class UserController {
     }
 
     /**
-     * 根据登录账号获取用户信息与权限
+     * 根据用户ID获取用户信息
+     */
+    @RequestMapping(value = "getGradeUser/{userId}", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> getGradeUser(@PathVariable("userId") Integer userId) {
+        return userService.getGradeUser(userId);
+    }
+
+    /**
+     * 修改密码
      */
     @RequestMapping(value = "updatePassword", produces = "application/json; charset=utf-8")
     @ResponseBody
     public Map<String, Object> updatePassword(@RequestBody UpdatePasswordParam param) {
         return userService.updatePassword(param);
     }
+
+    /**
+     * 查询用户列表
+     */
+    @RequestMapping(value = "getUserList", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> getUserList(@RequestBody GetUserListParam param) {
+        return userService.getUserList(param);
+    }
+
+    /**
+     * 删除用户
+     */
+    @RequestMapping(value = "removeUser/{userId}", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> removeUser(@PathVariable("userId") Integer userId) {
+        return userService.removeUser(userId);
+    }
+
+    /**
+     * 添加用户
+     */
+    @RequestMapping(value = "addGradeUser", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> addGradeUser(@RequestBody GradeUser user) {
+        return userService.addGradeUser(user);
+    }
+
+    /**
+     * 修改用户信息
+     */
+    @RequestMapping(value = "updateGradeUser", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> updateGradeUser(@RequestBody GradeUser user) {
+        return userService.updateGradeUser(user);
+    }
+
 }

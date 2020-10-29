@@ -4,8 +4,11 @@ import com.school.grade.entity.LoginParam;
 import com.school.grade.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -34,6 +37,11 @@ public class AdminController {
     @RequestMapping("/password-edit")
     public String passwordEdit() {
         return "password-edit";
+    }
+
+    @RequestMapping("/user-list")
+    public String userList() {
+        return "user-list";
     }
 
 }
