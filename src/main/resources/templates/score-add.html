@@ -1,0 +1,841 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="Bookmark" href="/favicon.ico">
+    <link rel="Shortcut Icon" href="/favicon.ico"/>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui/css/H-ui.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/H-ui.admin.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/skin/default/skin.css}" } id="skin"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/style.css}"/>
+    <!--本页面表格使用vue element-ui样式-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vue/element-ui/index.css}">
+    <!--[if IE 6]>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <style>
+        .el-table td, .el-table th{
+            padding:3px 0;
+        }
+        .buttionClass{
+            margin-left: 20px;
+            font-size: 16px;
+            padding: 6px;
+        }
+    </style>
+    <title>添加评分</title>
+</head>
+<body>
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i> 首頁
+    <span class="c-gray en">&gt;</span>评分管理 <span class="c-gray en">&gt;</span>
+    <span class="c-gray en">&gt;</span> 添加评分
+</nav>
+<div class="page-container" id="app">
+    <el-form :model="form"  :rules="rules" ref="form"  class="demo-ruleForm">
+        <el-form-item>
+            <el-row>
+                <el-col :span="8">
+                    <el-form-item label="所在倉庫" :label-width="formLabelWidth" prop="wiId">
+                        <el-select v-model="form.wiId" placeholder="请选择" class="selectClass"
+                                   @change="handleWarehouseChange">
+                            <el-option
+                                    v-for="item in warehouseList"
+                                    :key="item.wiId"
+                                    :label="item.wiName"
+                                    :value="item.wiId">
+                            </el-option>
+                        </el-select>
+                        <span style="color: red;line-height: 1;padding-top: 4px;position: absolute;
+                            font-size: 12px;top: 100%;left: 0;">變更倉庫會清空其他數據</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="領用單位" :label-width="formLabelWidth" prop="wcId">
+                        <el-select v-model="form.wcId" clearable placeholder="请选择" class="selectClass">
+                            <el-option
+                                    v-for="item in consumerList"
+                                    :key="item.wcId"
+                                    :label="item.wcName"
+                                    :value="item.wcId">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="服務對象" :label-width="formLabelWidth" prop="wpId">
+                        <el-select v-model="form.wpId" placeholder="请选择" class="selectClass">
+                            <el-option
+                                    v-for="item in purposeList"
+                                    :key="item.wpId"
+                                    :label="item.wpName"
+                                    :value="item.wpId">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form-item>
+        <el-form-item label="快速查找素材" :label-width="formLabelWidth" prop="name">
+            <el-autocomplete
+                    :fetch-suggestions="querySearchAsync"
+                    v-model="form.name"
+                    style="width: 86.5%"
+                    :clearable="true"
+                    placeholder="请输入素材名稱"
+                    @select="handleSelect">
+            </el-autocomplete>
+        </el-form-item>
+        <el-form-item label="選擇素材" :label-width="formLabelWidth">
+            <el-col :span="3">
+                <el-form-item prop="firstId">
+                    <el-select v-model="form.firstId" placeholder="請選擇素材類別"
+                               class="selectGoods" @change="getSecondGoodsList">
+                        <el-option
+                                v-for="item in firstGoodsList"
+                                :key="item.firstId"
+                                :label="item.firstName"
+                                :value="item.firstId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="3">
+                <el-form-item prop="secondId">
+                    <el-select v-model="form.secondId" placeholder="請選擇品種項目"
+                               class="selectGoods" @change="getThreeGoodsList">
+                        <el-option
+                                v-for="item in secondGoodsList"
+                                :key="item.secondId"
+                                :label="item.secondName"
+                                :value="item.secondId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="3">
+                <el-form-item prop="thirdId">
+                    <el-select v-model="form.thirdId" placeholder="請選擇品種細類"
+                               class="selectGoods" @change="getGoodsList">
+                        <el-option
+                                v-for="item in threeGoodsList"
+                                :key="item.thirdId"
+                                :label="item.thirdName"
+                                :value="item.thirdId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item prop="goodsId">
+                    <el-select v-model="form.goodsId" placeholder="請選擇素材"
+                               style="width:98%" @change="handleGoodsChange">
+                        <el-option
+                                v-for="item in goodsList"
+                                :key="item.goodsId"
+                                :label="item.goodsRemark"
+                                :value="item.goodsId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+        </el-form-item>
+        <el-form-item>
+            <el-row>
+                <el-col :span="6">
+                    <el-form-item label="當前庫存" :label-width="formLabelWidth">
+                        <strong style="font-size: 20px;" v-if="showUnitQuantity">{{totalQuantity}}</strong>
+                        <strong style="font-size: 20px;" v-else>{{packTotalQuantity}}</strong>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                    <el-form-item label="出庫數量" label-width="100px" prop="quantity">
+                        <el-input
+                                style="width: 220px;"
+                                v-model="form.quantity"
+                                @change="checkQuantity($event)">
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item prop="unit" label="出庫單位" label-width="200px">
+                        <el-select v-model="form.unit" placeholder="出庫單位" @change="handleUnitChange">
+                            <el-option
+                                v-for="item in unitList"
+                                :key="item.type"
+                                :label="item.unitName"
+                                :value="item.type">
+                            </el-option>
+                        </el-select>
+                        <el-button type="success" @click="addInfoToTable" size="small" class="buttionClass">
+                            <i class="el-icon-plus"></i>添加
+                        </el-button>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form-item>
+        <el-form-item label="已添加" :label-width="formLabelWidth">
+            <el-table
+                    :header-cell-style="{background:'#F5F7FA',color:'#606266','text-align':'center'}"
+                    :data="tableData"
+                    style="width: 100%;"
+                    :height="tableHeight"
+                    border>
+                <el-table-column
+                        align="center"
+                        prop="goodsName"
+                        label="素材 品牌 規格">
+                    <template slot-scope="scope">
+                        {{scope.row.goodsName}}
+                        {{scope.row.goodsBrand}}
+                        {{scope.row.goodsSpec}}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="totalQuantity"
+                        align="right"
+                        width="110"
+                        label="庫存數量">
+                    <template slot-scope="scope">
+                        {{Number(scope.row.totalQuantity).toFixed(3)}}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="totalAmount"
+                        align="right"
+                        width="110"
+                        label="庫存金額">
+                    <template slot-scope="scope">
+                        {{'$'+Number(scope.row.totalAmount).toFixed(2)}}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="price"
+                        label="計量單價"
+                        width="110"
+                        align="right">
+                    <template slot-scope="scope">
+                        {{'$'+Number(scope.row.price).toFixed(2)}}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="quantity"
+                        label="出庫計量數量"
+                        width="130"
+                        align="right">
+                    <template slot-scope="scope">
+                        {{Number(scope.row.quantity).toFixed(3)}}
+                        {{scope.row.goodsUnitName}}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="packPrice"
+                        align="right"
+                        width="110"
+                        label="包裝單價">
+                    <template slot-scope="scope">
+                        {{'$'+Number(scope.row.packPrice).toFixed(2)}}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="packQuantity"
+                        label="出庫包裝數量"
+                        width="130"
+                        align="right">
+                    <template slot-scope="scope">
+                        {{Number(scope.row.packQuantity).toFixed(3)}}
+                        {{scope.row.packUnitName}}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        prop="amount"
+                        align="right"
+                        width="130"
+                        label="金額">
+                    <template slot-scope="scope">
+                        {{'$'+Number(scope.row.amount).toFixed(2)}}
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        width="110"
+                        align="center"
+                        label="操作">
+                    <template slot-scope="scope">
+                        <el-row type="flex" class="row-bg" justify="center">
+                            <el-col :span="24">
+                                <el-button type="text"
+                                           icon="el-icon-delete"
+                                           style="font-size: 18px;padding: 0px;"
+                                           title="刪除"
+                                           @click="removeInfoForTable(scope.row.goodsId)">
+                                </el-button>
+                            </el-col>
+                        </el-row>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-form-item>
+        <el-form-item>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="備註" :label-width="formLabelWidth">
+                        <el-input
+                                type="textarea"
+                                rows="4"
+                                style="width:80%;vertical-align: top;"
+                                placeholder="請輸入訂單備註"
+                                v-model="form.comments"
+                                maxlength="200"
+                                show-word-limit
+                                clearable>
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="6" :label-width="formLabelWidth">
+                    <el-button type="success" @click="submitAdd('form')" size="medium" :disabled="isDisable">
+                        提交
+                    </el-button>
+                </el-col>
+            </el-row>
+        </el-form-item>
+    </el-form>
+</div>
+<script type="text/javascript" th:src="@{/moment/moment.min.js}"></script>
+<!--本页面表格使用vue.js-->
+<script type="text/javascript" th:src="@{/vue/vue.min.js}"></script>
+<script type="text/javascript" th:src="@{/vue/qs/qs.js}"></script>
+<script type="text/javascript" th:src="@{/vue/element-ui/index.js}"></script>
+<script type="text/javascript"  th:src="@{/vue/axios/axios.min.js}"></script>
+<script type="text/javascript">
+
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                form: {
+                    wcId:'',
+                    wpId:'',
+                    wiId:'',
+                    name: '',
+                    firstId: '',
+                    secondId: '',
+                    thirdId:'',
+                    goodsId:'',
+                    quantity:'',
+                    unit:'',
+                    comments:''
+                },
+                price:0,//库存计量单价
+                packPrice:0,//库存包装单价
+                totalQuantity:'',//库存计量数量
+                packTotalQuantity:'',//库存包装数量
+                showUnitQuantity:true,//默认显示库存计量数量
+                totalAmount:'',//库存金额
+                goodsProportion:'',//换算比例
+                isDisable:false,//防止重复提交
+                tableHeight:0,
+                consumerList:[],//領用單位集合
+                purposeList:[],//服務對象集合
+                warehouseList:[],//倉庫集合
+                tableData:[],
+                formLabelWidth: '150px',
+                unitList:[],
+                currentWiId:'',//当前仓库ID
+                firstGoodsList:[],//一級素材集合
+                secondGoodsList:[],//二級素材集合
+                threeGoodsList:[],//三級素材集合
+                goodsList:[],//素材集合
+                rules: {
+                    wcId:[
+                        { required: true, message: '請選擇領用單位', trigger: 'change' }
+                    ],
+                    wiId:[
+                        { required: true, message: '請選擇倉庫', trigger: 'change' }
+                    ],
+                    wpId:[
+                        { required: true, message: '請選擇服務對象', trigger: 'change' }
+                    ]
+                },
+            }
+        },
+        mounted(){
+            this.$nextTick(() => {
+                this.tableHeight = window.innerHeight - 480;
+            })
+            this.getGoodsFirst()
+            axios({
+                method:'get',
+                url:weburl + 'getConsumerList'
+            }).then(res => {
+                this.consumerList = res.data.list
+            })
+            axios({
+                method:'post',
+                url:weburl + 'getWareHouseInfo'
+            }).then(res => {
+                this.warehouseList = res.data.list
+            })
+            axios({
+                method:'get',
+                url:weburl + 'getPurposeList'
+            }).then(res => {
+                this.purposeList = res.data.list
+            })
+        },
+        methods:{
+            getWarehouseVoucherOutList(){
+                this.isLoading = true;
+                this.getData();
+            },
+            current_change:function(currentPage){
+                this.currentPage = currentPage;
+                this.getData();
+            },
+            getDateString(date){
+                if(date == undefined){
+                    return "";
+                }else {
+                    return moment(date).format("DD/MM/yyyy");
+                }
+            },
+            getCookie(name) {
+                var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+                if (arr = document.cookie.match(reg))
+                    return unescape(arr[2]);
+                else
+                    return null;
+            },
+            handleWarehouseChange(){
+                let flag = this.form.goodsId || this.tableData.length ||
+                    this.form.unit || this.unitList.length || this.totalQuantity;
+                if(flag){
+                    this.form.goodsId = '';//取消选择的素材
+                    this.totalQuantity = '';//清空库存数量
+                    this.totalAmount = '';//清空库存金額
+                    this.unitList = [];//清空出库单位
+                    this.form.unit = '';//取消选择的單位
+                    this.packTotalQuantity = '';//清空库存包装数量
+                    this.form.quantity = '';//清空出库数量
+                    this.showUnitQuantity = true;//默认显示计量数量
+                    this.tableData = [];//清空列表数据
+                }
+            },
+            querySearchAsync(queryString, callback) {
+                let list = [{}];
+                if(queryString.length > 0){
+                    axios({
+                        method:'get',
+                        url:weburl + 'getGoodsByName',
+                        params:{
+                            name:queryString,
+                            goodsAttribute:2
+                        }
+                    }).then(res => {
+                        if(res.data.code == '1'){
+                            //在这里为这个数组中每一个对象加一个value字段, 因为autocomplete只识别value字段并在下拉列中显示
+                            list = res.data.list.filter(item => {
+                                let goods = item.goodsNo == '' ? '' : '(' + item.goodsNo + ')';
+                                goods += item.goodsName;
+                                goods += item.goodsBrand == '' ? '' : '(' + item.goodsBrand + ')';
+                                goods += item.goodsSpec == '' ? '' : '(' + item.goodsSpec + ')';
+                                goods += item.goodsSize == '' ? '' : '(' + item.goodsSize + ')';
+                                if(item.goodsSizeUnit != 0){
+                                    goods += item.pack;
+                                }
+                                item.value = goods;//为对象添加一个属性value,将想要展示的数据为value赋值
+                                return item;
+                            })
+                        }
+                        callback(list);//回调函数
+                    }).catch((error) => {console.log(error)});
+                }else{
+                    callback(list);//回调函数
+                }
+            },
+            getData(){
+                let start = '';
+                let end = '';
+                if(this.dates != undefined && this.dates.length > 0){
+                    start = moment(this.dates[0]).format("yyyy-MM-DD");
+                    end = moment(this.dates[1]).format("yyyy-MM-DD");
+                }
+                let param = {
+                    startDate:start,
+                    endDate:end,
+                    wcId:this.wcId,
+                    wpId:this.wpId,
+                    currentPage:this.currentPage,
+                    pageSize:this.pageSize,
+                    wiId:this.wiId,
+                    appId:1
+                };
+                axios({
+                    method:'get',
+                    url:weburl+'getWarehouseVoucherOutList',
+                    params:param
+                }).then(res => {
+                    this.tableData = res.data.page.list
+                    this.total = res.data.page.total
+                    this.isLoading = false
+                })
+            },
+            addInfoToTable(){
+                let goods = this.goodsList.find(item => this.form.goodsId == item.goodsId);
+                if(this.tableData.length > 0){
+                    if(this.tableData.find(item => goods.goodsId == item.goodsId)){
+                        this.$message({
+                            showClose: true,
+                            message: '不能重複添加素材',
+                            type: 'warning'
+                        });
+                        return;
+                    }
+                }
+                if(this.checkData()){
+                    let quantity = '';
+                    let packQuantity = '';
+                    if(this.form.unit == 1){//計量單位
+                        quantity = this.form.quantity;
+                        packQuantity = this.form.quantity/this.goodsProportion;
+                    }else{
+                        packQuantity = this.form.quantity;
+                        quantity = this.form.quantity*this.goodsProportion;
+                    }
+                    let voucherOutInfo = {
+                        goodsId:goods.goodsId,
+                        totalAmount:this.totalAmount,
+                        totalQuantity:this.totalQuantity,
+                        goodsAttribute:goods.goodsAttribute,
+                        goodsName:goods.goodsName,
+                        goodsAlias:goods.goodsAlias,
+                        goodsSpec:goods.goodsSpec,
+                        goodsBrand:goods.goodsBrand,
+                        goodsUnitName:goods.wguName,
+                        price:this.price,
+                        quantity:quantity,
+                        packPrice:this.packPrice,
+                        packQuantity:packQuantity,
+                        packUnitName:goods.pack,
+                        amount:this.price*quantity
+                    }
+                    this.tableData.push(voucherOutInfo);
+                }
+            },
+            checkData(){
+                if(!this.totalQuantity){
+                    this.$message({
+                        showClose: true,
+                        message: '請選擇庫存數量大於0的素材',
+                        type: 'warning'
+                    });
+                    return false;
+                }
+                if(!this.form.quantity || this.form.quantity <= 0){
+                    this.$message({
+                        showClose: true,
+                        message: '出庫數量必須大於0',
+                        type: 'warning'
+                    });
+                    return false;
+                }
+                if(!this.form.unit){
+                    this.$message({
+                        showClose: true,
+                        message: '請選擇出庫單位',
+                        type: 'warning'
+                    });
+                    return false;
+                }
+                if(this.form.unit == 1){
+                    if(this.form.quantity > this.totalQuantity){
+                        this.$message({
+                            showClose: true,
+                            message: '出庫數量不能大於庫存數量',
+                            type: 'warning'
+                        });
+                        return false;
+                    }
+                }else {
+                    if((this.form.quantity*this.goodsProportion) > this.totalQuantity){
+                        this.$message({
+                            showClose: true,
+                            message: '出庫數量不能大於庫存數量',
+                            type: 'warning'
+                        });
+                        return false;
+                    }
+                }
+                return true;
+            },
+            removeInfoForTable(goodsId){
+                this.tableData = this.tableData.filter(item => item.goodsId !== goodsId)
+            },
+            handleUnitChange(){
+                if(this.form.unit == 1){
+                    this.showUnitQuantity = true;
+                }else{
+                    this.showUnitQuantity = false;
+                }
+            },
+            handleSelect(item) {
+                this.form.name = '';
+                this.form.firstId = item.firstId;
+                axios({
+                    method:'get',
+                    url:weburl + "getGoodsSecondList",
+                    params:{firstId:this.form.firstId}
+                }).then(res => {
+                    if(res.data.code == "1"){
+                        this.secondGoodsList = res.data.list;
+                        this.form.secondId = item.secondId == 0 ? '' : item.secondId;
+                        axios({
+                            method:'get',
+                            url:weburl + "getGoodsThreeList",
+                            params:{firstId:this.form.firstId,secondId:this.form.secondId}
+                        }).then(res => {
+                            if(res.data.code == "1"){
+                                this.threeGoodsList = res.data.list;
+                                this.form.thirdId = item.thirdId == 0 ? '' : item.thirdId;;
+                                axios({
+                                    method:'get',
+                                    url:weburl + "getGoodsList",
+                                    params:{
+                                        firstId:this.form.firstId,
+                                        secondId:this.form.secondId,
+                                        threeId:this.form.thirdId,
+                                        goodsAttribute:2
+                                    }
+                                }).then(res => {
+                                    if(res.data.code == "1"){
+                                        this.goodsList = res.data.list.filter(items => {
+                                            let goods = items.goodsNo == '' ? '' : '(' + items.goodsNo + ')';
+                                            goods += items.goodsName;
+                                            goods += items.goodsBrand == '' ? '' : '(' + items.goodsBrand + ')';
+                                            goods += items.goodsSpec == '' ? '' : '(' + items.goodsSpec + ')';
+                                            goods += items.goodsSize == '' ? '' : '(' + items.goodsSize + ')';
+                                            if(items.goodsSizeUnit != 0){
+                                                goods += items.pack;
+                                            }
+                                            items.goodsRemark = goods;//将素材信息赋值到goodsRemark,素材选择嚣显示goodsRemark
+                                            return items;
+                                        })
+                                        this.form.goodsId = item.goodsId;
+                                        this.handleGoodsChange();//触发素材change事件,为出库单位插入数据
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            },
+            getGoodsFirst(){
+                axios({
+                    method:'get',
+                    url:weburl + "getGoodsFirstList"
+                }).then(res => {
+                    if(res.data.code == "1"){
+                        this.firstGoodsList = res.data.list;
+                    }
+                })
+            },
+            getSecondGoodsList(){
+                axios({
+                    method:'get',
+                    url:weburl + "getGoodsSecondList",
+                    params:{firstId:this.form.firstId}
+                }).then(res => {
+                    if(res.data.code == "1"){
+                        this.secondGoodsList = res.data.list;
+                        this.form.secondId = '';
+                        this.form.thirdId = '';
+                        this.form.goodsId = '';
+                        this.form.unitName = '';
+                        this.threeGoodsList = [];
+                        this.goodsList = [];
+                        if(this.secondGoodsList.length == 0){
+                            this.getGoodsList();
+                        }
+                    }
+                })
+            },
+            getThreeGoodsList(){
+                axios({
+                    method:'get',
+                    url:weburl + "getGoodsThreeList",
+                    params:{firstId:this.form.firstId,secondId:this.form.secondId}
+                }).then(res => {
+                    if(res.data.code == "1"){
+                        this.threeGoodsList = res.data.list;
+                        this.form.thirdId = '';
+                        this.form.goodsId = '';
+                        this.form.unitName = '';
+                        this.goodsList = [];
+                        if(this.threeGoodsList.length == 0){
+                            this.getGoodsList();
+                        }
+                    }
+                })
+            },
+            getGoodsList(){
+                axios({
+                    method:'get',
+                    url:weburl + "getGoodsList",
+                    params:{
+                        firstId:this.form.firstId,
+                        secondId:this.form.secondId,
+                        threeId:this.form.thirdId,
+                        goodsAttribute:2}
+                }).then(res => {
+                    if(res.data.code == "1"){
+                        this.goodsList = res.data.list.filter(item => {
+                            let goods = item.goodsNo == '' ? '' : '(' + item.goodsNo + ')';
+                            goods += item.goodsName;
+                            goods += item.goodsBrand == '' ? '' : '(' + item.goodsBrand + ')';
+                            goods += item.goodsSpec == '' ? '' : '(' + item.goodsSpec + ')';
+                            goods += item.goodsSize == '' ? '' : '(' + item.goodsSize + ')';
+                            if(item.goodsSizeUnit != 0){
+                                goods += item.pack;
+                            }
+                            item.goodsRemark = goods;//将素材信息赋值到goodsRemark,素材选择嚣显示goodsRemark
+                            return item;
+                        })
+                        this.form.goodsId = '';
+                        this.form.unitName = '';
+                    }
+                })
+            },
+            checkQuantity(value){
+                if(/^[0-9]+(.[0-9]{1,3})?$/.test(value)){
+                    if(value <= 0){
+                        this.form.quantity = 1;
+                    }else{
+                        this.form.quantity = Number(value);
+                    }
+                }else{
+                    this.form.quantity = 1;
+                }
+            },
+            handleGoodsChange(){
+                let goods = this.goodsList.find(item => this.form.goodsId === item.goodsId);
+                this.unitList = [];//先清空出库单位
+                //type【1计量单位,2包装单位】
+                if(goods.wguName == goods.pack){//计量单位与包装单位相同
+                    this.unitList.push({type:1,unitName:goods.wguName});
+                }else{
+                    this.unitList.push({type:1,unitName:goods.wguName});
+                    this.unitList.push({type:2,unitName:goods.pack});
+                }
+                this.form.unit = 1;//默认选择第一条数据
+                this.goodsProportion = goods.goodsProportion;
+                axios({
+                    method:'get',
+                    url:weburl + "getGoodsStock",
+                    params:{goodsId:this.form.goodsId,wiId:this.form.wiId}
+                }).then(res => {
+                    if(res.data.stock){
+                        let stock = res.data.stock;
+                        this.totalQuantity = stock.quantity;
+                        this.totalAmount = stock.amount;
+                        this.packTotalQuantity = Number(stock.quantity/this.goodsProportion).toFixed(3);
+                        this.price = Number(stock.amount/stock.quantity).toFixed(2);//计量单价
+                        this.packPrice = Number(stock.amount/(stock.quantity/this.goodsProportion)).toFixed(2);//包装单价
+                    }else{
+                        this.totalQuantity = 0;
+                        this.price = 0;
+                        this.totalAmount = 0;
+                        this.packPrice = 0;
+                        this.packTotalQuantity = 0;
+                    }
+                })
+            },
+            submitAdd(formName){
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        if(this.tableData.length <= 0){//如果没有选择一行数据则不允许提交
+                            this.$message({
+                                showClose: true,
+                                message: '請確保表格至少有一條數據',
+                                type: 'warning'
+                            });
+                            return;
+                        }
+                        this.isDisable = true;//禁用提交按钮
+                        let consumer = this.consumerList.find(item => item.wcId === this.form.wcId);//領用單位對象
+                        let purpose = this.purposeList.find(item => item.wpId === this.form.wpId);//服務對象
+                        let totalAmount = 0;//拿到出庫总金额
+                        for(let i=0; i<this.tableData.length; i++){
+                            totalAmount += Number(this.tableData[i].amount);
+                        }
+                        let voucherOut = {//出庫信息
+                            wiId:this.form.wiId,
+                            wcId:this.form.wcId,
+                            wcName:consumer.wcName,
+                            wpId:this.form.wpId,
+                            wpName:purpose.wpName,
+                            items:this.tableData.length,
+                            amount:totalAmount,
+                            comments:this.form.comments,
+                            clerkId:this.getCookie('clerkId'),
+                            clerkName:this.getCookie('clerkName'),
+                            appId:1
+                        };
+                        const list = this.tableData;
+                        let outItems = [];//出庫明細信息
+                        for(let i=0; i<list.length; i++){
+                            let item = {
+                                goodsId:list[i].goodsId,
+                                goodsAttribute:list[i].goodsAttribute,
+                                goodsName:list[i].goodsName,
+                                goodsAlias:list[i].goodsAlias,
+                                goodsSpec:list[i].goodsSpec,
+                                goodsBrand:list[i].goodsBrand,
+                                goodsUnitName:list[i].goodsUnitName,
+                                price:list[i].price,
+                                quantity:list[i].quantity,
+                                amount:list[i].amount
+                            }
+                            outItems.push(item)
+                        }
+                        axios({
+                            method: 'post',
+                            url: weburl + 'addWarehouseVoucherOut',
+                            data: Qs.stringify({
+                                voucherOut:JSON.stringify(voucherOut),
+                                outItems:JSON.stringify(outItems)
+                            })
+                        }).then(res => {
+                            if (res.data.code == "1") {
+                                this.$message({
+                                    showClose: true,
+                                    message: '添加出庫記錄成功',
+                                    type: 'success'
+                                });
+                                setTimeout(() =>{window.location.href = 'warehouseVoucherOut-list';},1500)
+                            } else {
+                                this.$message({
+                                    showClose: true,
+                                    message: '添加出庫記錄失敗',
+                                    type: 'error'
+                                });
+                            }
+                        })
+                    } else {
+                        return false;
+                    }
+                })
+            }
+        }
+    });
+</script>
+</body>
+</html>
