@@ -44,9 +44,9 @@ public class AdminController {
         return "user-list";
     }
 
-    @RequestMapping("/score-add")
-    public String addScore() {
-        return "score-add";
+    @RequestMapping("/score-list")
+    public String scoreList() {
+        return "score-list";
     }
 
     @RequestMapping("/relation-list")

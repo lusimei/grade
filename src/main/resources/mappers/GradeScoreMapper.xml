@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.school.grade.mapper.GradeScoreMapper">
+    <resultMap id="BaseResultMap" type="com.school.grade.entity.GradeScore">
+        <id column="GS_ID" property="gsId"/>
+        <result column="TEACHER_ID" property="teacherId"/>
+        <result column="STUDENT_ID" property="studentId"/>
+        <result column="WEEK_NUMBER" property="weekNumber"/>
+        <result column="DISCIPLINE_SCORE" property="disciplineScore"/>
+        <result column="STUDY_SCORE" property="studyScore"/>
+        <result column="HEALTH_SCORE" property="healthScore"/>
+        <result column="SPORTS_SCORE" property="sportsScore"/>
+        <result column="ENTERTAINMENT_SCORE" property="entertainmentScore"/>
+        <result column="PEACETIME_SCORE" property="peacetimeScore"/>
+        <result column="COMMENTS" property="comments"/>
+        <result column="CREATE_TIME" property="createTime"/>
+        <result column="UPDATE_TIME" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        GS_ID,
+        TEACHER_ID,
+        STUDENT_ID,
+        WEEK_NUMBER,
+        DISCIPLINE_SCORE,
+        STUDY_SCORE,
+        HEALTH_SCORE,
+        SPORTS_SCORE,
+        ENTERTAINMENT_SCORE,
+        PEACETIME_SCORE,
+        COMMENTS,
+        CREATE_TIME,
+        UPDATE_TIME
+    </sql>
+
+    <!--<select id="selectGradeUser" resultMap="BaseResultMap" >-->
+        <!--SELECT-->
+          <!--<include refid="Base_Column_List" />-->
+        <!--FROM-->
+          <!--grade_user-->
+        <!--WHERE-->
+          <!--ACCOUNT_NUMBER = #{accountNumber}-->
+        <!--AND-->
+          <!--ACCOUNT_PASSWORD = #{accountPassword}-->
+    <!--</select>-->
+
+    <!--<select id="selectGradeUserByAccount" resultMap="BaseResultMap">-->
+        <!--SELECT-->
+          <!--<include refid="Base_Column_List"/>-->
+        <!--FROM-->
+          <!--grade_user-->
+        <!--WHERE-->
+          <!--ACCOUNT_NUMBER = #{account}-->
+        <!--AND-->
+          <!--STATUS = 1-->
+    <!--</select>-->
+
+    <!--<select id="selectGradeUserList" resultMap="BaseResultMap">-->
+        <!--SELECT-->
+          <!--<include refid="Base_Column_List"/>-->
+        <!--FROM-->
+          <!--grade_user-->
+        <!--<where>-->
+            <!--STATUS = 1-->
+            <!--<if test="grId != null">-->
+                <!--AND ACCOUNT_TYPE = #{grId}-->
+            <!--</if>-->
+            <!--<if test="userName != ''">-->
+                <!--AND (USER_NAME LIKE #{userName} OR ACCOUNT_NUMBER LIKE #{userName})-->
+            <!--</if>-->
+        <!--</where>-->
+        <!--ORDER BY CREATE_TIME DESC-->
+    <!--</select>-->
+
+    <update id="updateGradeScore">
+        UPDATE
+          grade_user
+        <set>
+            <if test="disciplineScore != null">
+                DISCIPLINE_SCORE = #{disciplineScore,jdbcType=REAL},
+            </if>
+            <if test="studyScore != null">
+                STUDY_SCORE = #{studyScore,jdbcType=REAL},
+            </if>
+            <if test="healthScore != null">
+                HEALTH_SCORE = #{healthScore,jdbcType=REAL},
+            </if>
+            <if test="sportsScore != null">
+                SPORTS_SCORE = #{sportsScore,jdbcType=REAL},
+            </if>
+            <if test="entertainmentScore != null">
+                ENTERTAINMENT_SCORE = #{entertainmentScore,jdbcType=REAL},
+            </if>
+            <if test="peacetimeScore != null">
+                PEACETIME_SCORE = #{peacetimeScore,jdbcType=REAL},
+            </if>
+            <if test="comments != null">
+                COMMENTS = #{comments,jdbcType=VARCHAR},
+            </if>
+        </set>
+        WHERE GS_ID = #{gsId}
+    </update>
+
+    <insert id="insertGradeScore">
+        INSERT INTO grade_score
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="gsId != null">
+                GS_ID,
+            </if>
+            <if test="teacherId != null">
+                TEACHER_ID,
+            </if>
+            <if test="studentId != null">
+                STUDENT_ID,
+            </if>
+            <if test="weekNumber != null">
+                WEEK_NUMBER,
+            </if>
+            <if test="disciplineScore != null">
+                DISCIPLINE_SCORE,
+            </if>
+            <if test="studyScore != null">
+                STUDY_SCORE,
+            </if>
+            <if test="healthScore != null">
+                HEALTH_SCORE,
+            </if>
+            <if test="sportsScore != null">
+                SPORTS_SCORE,
+            </if>
+            <if test="entertainmentScore != null">
+                ENTERTAINMENT_SCORE,
+            </if>
+            <if test="peacetimeScore != null">
+                PEACETIME_SCORE,
+            </if>
+            <if test="comments != null">
+                COMMENTS,
+            </if>
+            <if test="createTime != null">
+                CREATE_TIME,
+            </if>
+            <if test="updateTime != null">
+                UPDATE_TIME,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="gsId != null">
+                #{gsId,jdbcType=INTEGER},
+            </if>
+            <if test="teacherId != null">
+                #{teacherId,jdbcType=INTEGER},
+            </if>
+            <if test="studentId != null">
+                #{studentId,jdbcType=INTEGER},
+            </if>
+            <if test="weekNumber != null">
+                #{weekNumber,jdbcType=INTEGER},
+            </if>
+            <if test="disciplineScore != null">
+                #{disciplineScore,jdbcType=REAL},
+            </if>
+            <if test="studyScore != null">
+                #{studyScore,jdbcType=REAL},
+            </if>
+            <if test="healthScore != null">
+                #{healthScore,jdbcType=REAL},
+            </if>
+            <if test="sportsScore != null">
+                #{sportsScore,jdbcType=REAL},
+            </if>
+            <if test="entertainmentScore != null">
+                #{entertainmentScore,jdbcType=REAL},
+            </if>
+            <if test="peacetimeScore != null">
+                #{peacetimeScore,jdbcType=REAL},
+            </if>
+            <if test="comments != null">
+                #{comments,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=DATETIME},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=DATETIME},
+            </if>
+        </trim>
+    </insert>
+</mapper>

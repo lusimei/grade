@@ -1,0 +1,286 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="Bookmark" href="/favicon.ico">
+    <link rel="Shortcut Icon" href="/favicon.ico"/>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui/css/H-ui.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/H-ui.admin.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/skin/default/skin.css}" } id="skin"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/style.css}"/>
+    <!--本页面表格使用vue element-ui样式-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vue/element-ui/index.css}">
+    <!--[if IE 6]>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <style>
+        .el-table td, .el-table th{
+            padding:3px 0;
+        }
+        .buttionClass{
+            margin-left: 20px;
+            font-size: 16px;
+            padding: 6px;
+        }
+    </style>
+    <title>评分列表</title>
+</head>
+<body>
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i> 首頁
+    <span class="c-gray en">&gt;</span>评分管理
+    <span class="c-gray en">&gt;</span>评分列表
+</nav>
+<div class="page-container" id="app">
+    <el-row>
+        <el-col :span="24" style="text-align: center;">
+            <el-input
+                    class="input"
+                    placeholder="請輸入老师姓名"
+                    v-model.lazy="teacherName"
+                    clearable
+                    @keyup.enter.native="getGradeRelationList">
+            </el-input>
+            <el-input
+                    class="input"
+                    placeholder="請輸入学生姓名"
+                    v-model.lazy="studentName"
+                    clearable
+                    @keyup.enter.native="getGradeRelationList">
+            </el-input>
+            标准周:
+            <el-select v-model="wiId" placeholder="请选择" class="selectClass">
+                <el-option
+                        v-for="item in warehouseList"
+                        :key="item.wiId"
+                        :label="item.wiName"
+                        :value="item.wiId">
+                </el-option>
+            </el-select>
+            <el-button @Click="getWarehouseVoucherInventoryList"
+                       type="primary"
+                       class="buttionClass"
+                       size="small"
+                       :loading="isLoading">
+                查询
+            </el-button>
+            <el-button type="primary" @click="addVoucherInventory" size="small" class="buttionClass">
+                <i class="el-icon-plus"></i>添加评分
+            </el-button>
+        </el-col>
+    </el-row>
+    <el-table
+            :header-cell-style="{background:'#F5F7FA',color:'#606266','text-align':'center'}"
+            :data="tableData"
+            tooltip-effect="dark"
+            style="width: 100%;margin: 20px 0px;"
+            :height="tableHeight"
+            border>
+        <el-table-column>
+            <template slot="header" slot-scope="slot">
+                <span style="float: left;">
+                    <el-pagination
+                            background
+                            small
+                            style="display: inline-block;"
+                            :page-size="pageSize"
+                            layout="prev, pager, next"
+                            :total="total"
+                            @current-change="current_change">
+                    </el-pagination>
+                </span>
+                <strong style="float: right;margin-right: 15px;">共有數據： {{total}}條</strong>
+            </template>
+            <el-table-column
+                    prop="teacherName"
+                    label="教师名称">
+            </el-table-column>
+            <el-table-column
+                    prop="studentName"
+                    label="学生名称">
+            </el-table-column>
+            <el-table-column
+                    prop="weekNumber"
+                    label="标准周">
+            </el-table-column>
+            <el-table-column
+                    prop="disciplineScore"
+                    label="纪律分">
+            </el-table-column>
+            <el-table-column
+                    prop="studyScore"
+                    label="学习分">
+            </el-table-column>
+            <el-table-column
+                    prop="healthScore"
+                    label="卫生分">
+            </el-table-column>
+            <el-table-column
+                    prop="sportsScore"
+                    label="体育分">
+            </el-table-column>
+            <el-table-column
+                    prop="disciplineScore"
+                    label="纪律分">
+            </el-table-column>
+            <el-table-column
+                    prop="entertainmentScore"
+                    label="文娱分">
+            </el-table-column>
+            <el-table-column
+                    prop="peacetimeScore"
+                    label="平时表现分">
+            </el-table-column>
+            <el-table-column
+                    prop="comments"
+                    label="备注">
+            </el-table-column>
+            <el-table-column
+                    width="90"
+                    align="center"
+                    label="操作">
+                <template slot-scope="scope">
+                    <el-row type="flex" class="row-bg" justify="center">
+                        <el-col :span="8">
+                            <el-button type="text"
+                                       icon="el-icon-edit"
+                                       style="font-size: 18px;padding: 0px;"
+                                       title="修改"
+                                       @click="editVoucherInventoryItems(scope.row)">
+                            </el-button>
+                        </el-col>
+                        <el-col :span="8">
+                            <el-button type="text"
+                                       icon="el-icon-edit"
+                                       style="font-size: 18px;padding: 0px;"
+                                       title="删除"
+                                       @click="editVoucherInventoryItems(scope.row)">
+                            </el-button>
+                        </el-col>
+                    </el-row>
+                </template>
+            </el-table-column>
+        </el-table-column>
+    </el-table>
+</div>
+<script type="text/javascript" th:src="@{/moment/moment.min.js}"></script>
+<!--本页面表格使用vue.js-->
+<script type="text/javascript" th:src="@{/vue/vue.min.js}"></script>
+<script type="text/javascript" th:src="@{/vue/qs/qs.js}"></script>
+<script type="text/javascript" th:src="@{/vue/element-ui/index.js}"></script>
+<script type="text/javascript"  th:src="@{/vue/axios/axios.min.js}"></script>
+<script type="text/javascript">
+
+    new Vue({
+        el: '#app',
+        data: function() {
+            return {
+                total:0,
+                wiId:'',
+                pageSize:60,
+                currentPage:1,
+                tableHeight:0,
+                warehouseList:[],
+                tableData:[],
+                isLoading:false,
+                pickerOptions: {
+                    shortcuts: [{
+                        text: '本月',
+                        onClick(picker) {
+                            picker.$emit('pick', [new Date(), new Date()]);
+                        }
+                    }, {
+                        text: '今年至今',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date(new Date().getFullYear(), 0);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近六个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setMonth(start.getMonth() - 6);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }]
+                },
+                dates:[]
+            }
+        },
+        mounted(){
+            this.$nextTick(() => {
+                this.tableHeight = window.innerHeight - 180;
+            })
+            this.getWarehouseVoucherInventoryList()
+            axios({
+                method:'post',
+                url:weburl + 'getWareHouseInfo'
+            }).then(res => {
+                this.warehouseList = res.data.list
+            })
+        },
+        methods:{
+            getWarehouseVoucherInventoryList(){
+                this.isLoading = true;
+                this.currentPage = 1;
+                this.getData();
+            },
+            current_change:function(currentPage){
+                this.currentPage = currentPage;
+                this.getData();
+            },
+            getDateString(date){
+                if(date == undefined){
+                    return "";
+                }else {
+                    return moment(date).format("DD/MM/yyyy");
+                }
+            },
+            getData(){
+                let start = '';
+                let end = '';
+                if(this.dates != undefined && this.dates.length > 0){
+                    start = moment(this.dates[0]).format("yyyy-MM-DD");
+                    end = moment(this.dates[1]).format("yyyy-MM-DD");
+                }
+                let param = {
+                    startDate:start,
+                    endDate:end,
+                    currentPage:this.currentPage,
+                    pageSize:this.pageSize,
+                    wiId:this.wiId,
+                    appId:1
+                };
+                axios({
+                    method:'get',
+                    url:weburl+'getVoucherInventoryList',
+                    params:param
+                }).then(res => {
+                    this.tableData = res.data.page.list
+                    this.total = res.data.page.total
+                    this.isLoading = false
+                })
+            },
+            editVoucherInventoryItems(obj){
+                window.location.href = 'voucherInventoryItems-edit?'+Qs.stringify(obj);
+            },
+            addVoucherInventory(){
+                window.location.href = 'add-voucherInventory';
+            }
+        }
+    });
+</script>
+</body>
+</html>
