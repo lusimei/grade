@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.school.grade.mapper.GradeRelationMapper">
+    <resultMap id="BaseResultMap" type="com.school.grade.entity.GradeRelation">
+        <id column="GR_ID" property="grId"/>
+        <result column="TEACHER_ID" property="teacherId"/>
+        <result column="TEACHER_NAME" property="teacherName"/>
+        <result column="STUDENT_ID" property="studentId"/>
+        <result column="STUDENT_NAME" property="studentName"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        GR_ID,
+        TEACHER_ID,
+        TEACHER_NAME,
+        STUDENT_ID,
+        STUDENT_NAME
+    </sql>
+
+    <select id="selectGradeRelationList" resultMap="BaseResultMap">
+        SELECT
+          r.*,t.USER_NAME AS TEACHER_NAME,s.USER_NAME AS STUDENT_NAME
+        FROM
+          grade_user t
+        JOIN
+          grade_relation r
+        ON
+          t.USER_ID = r.TEACHER_ID
+        JOIN
+          grade_user s
+        ON
+          s.USER_ID = r.STUDENT_ID
+        <where>
+            <if test="teacherName != ''">
+                (t.USER_NAME LIKE #{teacherName})
+            </if>
+            <if test="studentName != ''">
+                AND (s.USER_NAME LIKE #{studentName})
+            </if>
+        </where>
+    </select>
+
+    <select id="selectRelationById" resultMap="BaseResultMap">
+        SELECT
+          *
+        FROM
+          grade_relation
+        WHERE
+          TEACHER_ID = #{teacherId}
+        AND
+          STUDENT_ID = #{studentId}
+    </select>
+
+    <insert id="insertGradeRelation">
+        INSERT INTO grade_relation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="grId != null">
+                GR_ID,
+            </if>
+            <if test="teacherId != null">
+                TEACHER_ID,
+            </if>
+            <if test="studentId != null">
+                STUDENT_ID,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="grId != null">
+                #{grId,jdbcType=INTEGER},
+            </if>
+            <if test="teacherId != null">
+                #{teacherId,jdbcType=INTEGER},
+            </if>
+            <if test="studentId != null">
+                #{studentId,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteGradeRelation">
+        DELETE FROM grade_relation WHERE GR_ID = #{grId}
+    </delete>
+</mapper>

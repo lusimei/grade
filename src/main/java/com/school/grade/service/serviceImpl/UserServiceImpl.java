@@ -3,12 +3,14 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.school.grade.entity.*;
 import com.school.grade.mapper.GradePermissionMapper;
+import com.school.grade.mapper.GradeRelationMapper;
 import com.school.grade.mapper.GradeRoleMapper;
 import com.school.grade.mapper.GradeUserMapper;
 import com.school.grade.service.UserService;
 import com.school.grade.utils.MD5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 
@@ -36,6 +38,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private GradeRoleMapper gradeRoleMapper;
+
+    @Autowired
+    private GradeRelationMapper gradeRelationMapper;
 
 	@Override
 	public Map<String, Object> userLogin(LoginParam info, HttpServletRequest request,
@@ -178,6 +183,60 @@ public class UserServiceImpl implements UserService {
         }
         gradeUserMapper.updateGradeUserInfo(user);
         result.put("code",1);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getGradeRelationList(GetGradeRelationListParam param) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        PageHelper.startPage(param.getCurrentPage(), param.getPageSize());
+        if(param.getTeacherName().length() > 0){
+            param.setTeacherName("%"+param.getTeacherName()+"%");
+        }
+        if(param.getStudentName().length() > 0){
+            param.setStudentName("%"+param.getStudentName()+"%");
+        }
+        List<GradeRelation> list = gradeRelationMapper
+                .selectGradeRelationList(param.getTeacherName(),param.getStudentName());
+        PageInfo<GradeRelation> page = new PageInfo<>(list);
+        result.put("code",1);
+        result.put("page",page);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> removeGradeRelation(Integer grId) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        gradeRelationMapper.deleteGradeRelation(grId);
+        result.put("code",1);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getTeacherAndStudentList() {
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("teacherList",gradeUserMapper.selectTeacherList());
+        result.put("studentList",gradeUserMapper.selectStudentList());
+        result.put("code",1);
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> addGradeRelation(List<GradeRelation> list) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        Integer count = 0;//用于记录已存在属系的数量
+        for (int i = 0; i < list.size(); i++) {
+            GradeRelation relation = gradeRelationMapper
+                    .selectRelationById(list.get(i).getTeacherId(),list.get(i).getStudentId());
+            if(relation == null){
+                gradeRelationMapper.insertGradeRelation(list.get(i));
+            }else {
+                count++;
+            }
+        }
+        result.put("code",1);
+        result.put("count",count);
         return result;
     }
 }

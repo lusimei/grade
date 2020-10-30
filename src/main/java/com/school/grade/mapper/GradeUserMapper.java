@@ -21,4 +21,8 @@ public interface GradeUserMapper {
     int deleteGradeUser(Integer userId);
 
     int insertGradeUser(GradeUser user);
+
+    List<GradeUser> selectTeacherList();
+
+    List<GradeUser> selectStudentList();
 }

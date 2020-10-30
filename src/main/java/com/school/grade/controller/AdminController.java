@@ -49,4 +49,8 @@ public class AdminController {
         return "score-add";
     }
 
+    @RequestMapping("/relation-list")
+    public String relationList() {
+        return "relation-list";
+    }
 }

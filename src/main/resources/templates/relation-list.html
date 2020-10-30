@@ -1,0 +1,405 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta http-equiv="Cache-Control" content="no-siteapp"/>
+<link rel="Bookmark" href="/favicon.ico">
+<link rel="Shortcut Icon" href="/favicon.ico"/>
+<!--[if lt IE 9]>
+<![endif]-->
+<link rel="stylesheet" type="text/css" th:href="@{/h-ui/css/H-ui.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/H-ui.admin.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/skin/default/skin.css}" } id="skin"/>
+<link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/style.css}"/>
+<link th:href="@{/lib/lightbox2/2.8.1/css/lightbox.css}" rel="stylesheet" type="text/css" >
+<!--本页面表格使用vue element-ui样式-->
+<link rel="stylesheet" type="text/css" th:href="@{/vue/element-ui/index.css}">
+
+<style type="text/css">
+    .input{
+        width: 220px;
+    }
+    .el-table td, .el-table th{
+        padding:2px 0;
+    }
+    .el-table .cell{
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+    .inputClass{
+        width: 350px;
+    }
+</style>
+    <title>属系列表</title>
+</head>
+<body>
+<nav class="breadcrumb nav">
+    <i class="Hui-iconfont">&#xe67f;</i> 首頁
+    <span class="c-gray en">&gt;</span>用户管理 <span class="c-gray en">&gt;</span>属系列表
+    <a class="btn btn-success radius r" style="line-height: 1.6em; margin-top: 3px;margin-right: 30px;"
+        href="javascript:location.replace(location.href);" title="刷新">
+        <i class="Hui-iconfont">&#xe68f;</i>
+    </a>
+</nav>
+<div class="page-container" id="app">
+    <el-row>
+        <el-col :span="24" style="text-align: center;">
+            <el-input
+                    class="input"
+                    placeholder="請輸入老师姓名"
+                    v-model.lazy="teacherName"
+                    clearable
+                    @keyup.enter.native="getGradeRelationList">
+            </el-input>
+            <el-input
+                    class="input"
+                    placeholder="請輸入学生姓名"
+                    v-model.lazy="studentName"
+                    clearable
+                    @keyup.enter.native="getGradeRelationList">
+            </el-input>
+            <el-button @Click="getGradeRelationList"
+                       type="primary"
+                       style="margin-left: 10px;font-size: 15px;padding: 7px 9px;"
+                       size="small"
+                       :loading="isLoading">
+                查询
+            </el-button>
+        </el-col>
+    </el-row>
+    <el-row>
+        <el-col :span="24"  style="background-color: #F5F7FA;border: 1px solid #EBEEF5;
+            border-bottom: 0px;padding: 6px;margin-top: 20px;">
+            <el-button type="primary" @click="addGradeRelation"
+                       style="margin-left: 10px;font-size: 15px;padding: 7px 9px;">
+                <i class="el-icon-plus"></i>添加关系
+            </el-button>
+        </el-col>
+    </el-row>
+    <el-dialog title="添加关系" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="630px" top="30px">
+        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+            <el-form-item label="教师" prop="teacherId">
+                <el-select v-model="ruleForm.teacherId" placeholder="请选择教师">
+                    <el-option
+                            v-for="item in teacherList"
+                            :key="item.userId"
+                            :label="item.userName"
+                            :value="item.userId">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="学生" prop="studentId">
+                <el-select v-model="ruleForm.studentId" placeholder="请选择学生">
+                    <el-option
+                            v-for="item in studentList"
+                            :key="item.userId"
+                            :label="item.userName"
+                            :value="item.userId">
+                    </el-option>
+                </el-select>
+                <el-button type="primary" @click="addInfoToTable"
+                           style="margin-left: 10px;font-size: 15px;padding: 7px 9px;">
+                    <i class="el-icon-plus"></i>添加
+                </el-button>
+            </el-form-item>
+            <el-form-item label="已添加">
+                <el-table
+                        :header-cell-style="{background:'#F5F7FA',color:'#606266','text-align':'center'}"
+                        :data="relationList"
+                        style="width: 400px;"
+                        :height="height"
+                        border>
+                    <el-table-column
+                            align="center"
+                            prop="teacherName"
+                            label="教师名称">
+                    </el-table-column>
+                    <el-table-column
+                            align="center"
+                            prop="studentName"
+                            label="学生名称">
+                    </el-table-column>
+                    <el-table-column
+                            width="110"
+                            align="center"
+                            label="操作">
+                        <template slot-scope="scope">
+                            <el-row type="flex" class="row-bg" justify="center">
+                                <el-col :span="24">
+                                    <el-button type="text"
+                                               icon="el-icon-delete"
+                                               style="font-size: 18px;padding: 0px;"
+                                               title="刪除"
+                                               @click="removeInfoForTable(scope.row)">
+                                    </el-button>
+                                </el-col>
+                            </el-row>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitInfo('ruleForm')">确 定</el-button>
+        </div>
+    </el-dialog>
+    <el-row>
+        <el-col :span="24" style="background-color: #F5F7FA;border: 1px solid #EBEEF5;border-bottom: 0px;">
+            <el-pagination
+                    background
+                    small
+                    style="display: inline-block;"
+                    :page-size="pageSize"
+                    layout="prev, pager, next"
+                    :total="total"
+                    @current-change="current_change">
+            </el-pagination>
+            <strong style="float: right;margin-right: 15px;">共有數據： {{total}}條</strong>
+        </el-col>
+    </el-row>
+    <el-table
+            :header-cell-style="{background:'#F5F7FA',color:'#606266','text-align':'center'}"
+            :data="tableData"
+            :cell-style="{'text-align':'center'}"
+            style="width: 100%;margin-bottom: 20px;"
+            :height="tableHeight"
+            border>
+        <el-table-column
+                prop="teacherName"
+                label="老师名称">
+        </el-table-column>
+        <el-table-column
+                prop="studentName"
+                label="学生名称">
+        </el-table-column>
+        <el-table-column
+                width="120"
+                align="center"
+                label="操作">
+            <template slot-scope="scope">
+                <el-row type="flex" class="row-bg" justify="center">
+                    <el-col :span="8">
+                        <el-button type="text"
+                                   icon="el-icon-delete"
+                                   style="font-size: 18px;padding: 0px;"
+                                   title="刪除"
+                                   @click="deleteGradeRelation(scope.row.grId)">
+                        </el-button>
+                    </el-col>
+                </el-row>
+            </template>
+        </el-table-column>
+    </el-table>
+</div>
+<script type="text/javascript" th:src="@{/moment/moment.min.js}"></script>
+<!--本页面表格使用vue.js-->
+<script type="text/javascript" th:src="@{/vue/vue.min.js}"></script>
+<script type="text/javascript" th:src="@{/vue/qs/qs.js}"></script>
+<script type="text/javascript" th:src="@{/vue/element-ui/index.js}"></script>
+<script type="text/javascript"  th:src="@{/vue/axios/axios.min.js}"></script>
+
+<script type="text/javascript">
+
+    new Vue({
+        el: '#app',
+        data: function() {
+            return {
+                total:0,
+                currentPage:1,
+                pageSize:60,
+                teacherName:'',
+                studentName:'',
+                tableHeight:0,
+                height:0,
+                relationList:[],
+                teacherList:[],
+                studentList:[],
+                tableData: [],
+                isLoading:false,
+                userId:'',
+                dialogFormVisible:false,
+                ruleForm:{
+                    teacherId:'',
+                    studentId:''
+                },
+                rules:{
+                    teacherId:[
+                        { required: true, message: '请选择老师', trigger: 'change' }
+                    ],
+                    studentId:[
+                        { required: true, message: '请选择学生', trigger: 'change' }
+                    ],
+                }
+            }
+        },
+        mounted(){
+            this.$nextTick(() => {
+                this.tableHeight = window.innerHeight - 260;//200根据需求空出的高度，自行调整
+                this.height = window.innerHeight - 450;//460根据需求空出的高度，自行调整
+            })
+            this.getGradeRelationList();
+        },
+        methods:{
+            getGradeRelationList(){
+                this.isLoading = true;
+                this.currentPage = 1;
+                this.getData();
+            },
+            current_change:function(currentPage){
+                this.currentPage = currentPage;
+                this.getData();
+            },
+            getData(){
+                let param = {
+                    currentPage:this.currentPage,
+                    pageSize:this.pageSize,
+                    teacherName:this.teacherName,
+                    studentName:this.studentName
+                };
+                axios({
+                    method:'post',
+                    url:"user/getGradeRelationList",
+                    data:param
+                }).then(res => {
+                    this.tableData = res.data.page.list
+                    this.total = res.data.page.total
+                    this.isLoading = false
+                })
+            },
+            addInfoToTable(){
+                this.$refs['ruleForm'].validate((valid) => {
+                    if (valid) {
+                        let teacher = this.teacherList.find(item => this.ruleForm.teacherId == item.userId);
+                        let student = this.studentList.find(item => this.ruleForm.studentId == item.userId);
+                        if(this.relationList.length > 0){
+                            if(this.relationList.find(item => teacher.userId == item.teacherId
+                                && student.userId == item.studentId)){
+                                this.$message({
+                                    showClose: true,
+                                    message: '不能重複添加',
+                                    type: 'warning'
+                                });
+                                return;
+                            }
+                        }
+                        let relation = {
+                            teacherId:teacher.userId,
+                            teacherName:teacher.userName,
+                            studentId:student.userId,
+                            studentName:student.userName
+                        }
+                        this.relationList.push(relation);
+                    } else {
+                        return false;
+                    }
+                })
+            },
+            removeInfoForTable(obj){
+                this.relationList = this.relationList.filter(item => item.teacherId !== obj.teacherId
+                    || item.studentId !== obj.studentId );
+            },
+            deleteGradeRelation(grId){
+                this.$confirm('此操作將刪除此記錄, 是否繼續?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios({
+                        method:'post',
+                        url:'user/removeGradeRelation/'+grId,
+                    }).then(res => {
+                        if(res.data.code == 1){
+                            this.$message({
+                                showClose: true,
+                                message: '刪除成功',
+                                type: 'success'
+                            });
+                            this.getGradeRelationList();
+                        }else{
+                            this.$message({
+                                showClose: true,
+                                message:'刪除失败',
+                                type: 'error'
+                            });
+                        }
+                    })
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+            addGradeRelation(){
+                this.dialogFormVisible = true;
+                this.$nextTick(()=>{
+                    this.$refs['ruleForm'].resetFields();
+                })
+                this.ruleForm.teacherId = '';
+                this.ruleForm.studentId = '';
+                this.relationList = [];
+                axios({
+                    method: 'post',
+                    url: 'user/getTeacherAndStudentList'
+                }).then(res => {
+                    if (res.data.code == 1) {
+                        this.teacherList = res.data.teacherList;
+                        this.studentList = res.data.studentList;
+                    }
+                })
+            },
+            submitInfo(formName){
+                this.dialogFormVisible = false;
+                if(this.relationList.length <= 0){
+                    this.$message({
+                        showClose: true,
+                        message:'请至少添加一条数据',
+                        type: 'warning'
+                    });
+                    return;
+                }
+                var relationList = [];
+                for (let i = 0; i < this.relationList.length; i++) {
+                    let relation = {
+                        teacherId:this.relationList[i].teacherId,
+                        studentId:this.relationList[i].studentId
+                    };
+                    relationList.push(relation)
+                }
+                axios({
+                    method: 'post',
+                    url: 'user/addGradeRelation',
+                    data: relationList
+                }).then(res => {
+                    if (res.data.code == 1) {
+                        let message = '添加属系成功';
+                        if(res.data.count > 0){
+                            message = '添加属系成功,有'+res.data.count+'条数据已存在';
+                        }
+                        this.$message({
+                            showClose: true,
+                            message: message ,
+                            type: 'success'
+                        });
+                        this.getGradeRelationList();
+                    } else {
+                        this.$message({
+                            showClose: true,
+                            message: '添加属系失敗',
+                            type: 'error'
+                        });
+                    }
+                })
+            }
+        }
+    });
+
+</script>
+</body>
+</html>

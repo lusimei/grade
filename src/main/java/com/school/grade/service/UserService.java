@@ -1,13 +1,11 @@
 package com.school.grade.service;
 
-import com.school.grade.entity.GetUserListParam;
-import com.school.grade.entity.GradeUser;
-import com.school.grade.entity.LoginParam;
-import com.school.grade.entity.UpdatePasswordParam;
+import com.school.grade.entity.*;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 public interface UserService {
@@ -28,4 +26,12 @@ public interface UserService {
     Map<String,Object> addGradeUser(GradeUser user);
 
     Map<String,Object> updateGradeUser(GradeUser user);
+
+    Map<String,Object> getGradeRelationList(GetGradeRelationListParam param);
+
+    Map<String,Object> removeGradeRelation(Integer grId);
+
+    Map<String,Object> getTeacherAndStudentList();
+
+    Map<String,Object> addGradeRelation(List<GradeRelation> list);
 }

@@ -1,8 +1,5 @@
 package com.school.grade.controller;
-import com.school.grade.entity.GetUserListParam;
-import com.school.grade.entity.GradeUser;
-import com.school.grade.entity.LoginParam;
-import com.school.grade.entity.UpdatePasswordParam;
+import com.school.grade.entity.*;
 import com.school.grade.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 
@@ -100,4 +98,39 @@ public class UserController {
         return userService.updateGradeUser(user);
     }
 
+    /**
+     * 查询属系列表
+     */
+    @RequestMapping(value = "getGradeRelationList", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> getGradeRelationList(@RequestBody GetGradeRelationListParam param) {
+        return userService.getGradeRelationList(param);
+    }
+
+    /**
+     * 删除属系
+     */
+    @RequestMapping(value = "removeGradeRelation/{grId}", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> removeGradeRelation(@PathVariable("grId") Integer grId) {
+        return userService.removeGradeRelation(grId);
+    }
+
+    /**
+     * 查询教师学生列表
+     */
+    @RequestMapping(value = "getTeacherAndStudentList", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> getTeacherAndStudentList() {
+        return userService.getTeacherAndStudentList();
+    }
+
+    /**
+     * 添加属系
+     */
+    @RequestMapping(value = "addGradeRelation", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> addGradeRelation(@RequestBody List<GradeRelation> list) {
+        return userService.addGradeRelation(list);
+    }
 }

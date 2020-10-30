@@ -68,6 +68,30 @@
         ORDER BY CREATE_TIME DESC
     </select>
 
+    <select id="selectTeacherList" resultMap="BaseResultMap">
+        SELECT
+          USER_ID,USER_NAME
+        FROM
+          grade_user
+        <where>
+              STATUS = 1
+            AND
+              ACCOUNT_TYPE = 2
+        </where>
+    </select>
+
+    <select id="selectStudentList" resultMap="BaseResultMap">
+        SELECT
+        USER_ID,USER_NAME
+        FROM
+        grade_user
+        <where>
+            STATUS = 1
+            AND
+            ACCOUNT_TYPE = 3
+        </where>
+    </select>
+
     <update id="deleteGradeUser">
         UPDATE
           grade_user
