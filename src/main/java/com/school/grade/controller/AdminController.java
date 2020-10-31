@@ -1,5 +1,6 @@
 package com.school.grade.controller;
 
+import com.school.grade.entity.GradeScore;
 import com.school.grade.entity.LoginParam;
 import com.school.grade.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,4 +54,10 @@ public class AdminController {
     public String relationList() {
         return "relation-list";
     }
+
+    @RequestMapping("/score-add")
+    public String scoreAdd() {
+        return "score-add";
+    }
+
 }

@@ -90,6 +90,7 @@
             :header-cell-style="{background:'#F5F7FA',color:'#606266','text-align':'center'}"
             :data="tableData"
             tooltip-effect="dark"
+            :cell-style="{'text-align':'center'}"
             style="width: 100%;margin: 20px 0px;"
             :height="tableHeight"
             border>
@@ -137,16 +138,17 @@
                     label="体育分">
             </el-table-column>
             <el-table-column
-                    prop="disciplineScore"
-                    label="纪律分">
-            </el-table-column>
-            <el-table-column
                     prop="entertainmentScore"
                     label="文娱分">
             </el-table-column>
             <el-table-column
                     prop="peacetimeScore"
                     label="平时表现分">
+            </el-table-column>
+            <el-table-column
+                    width="90"
+                    prop="avgScore"
+                    label="总平均分">
             </el-table-column>
             <el-table-column
                     prop="comments"
@@ -168,10 +170,10 @@
                         </el-col>
                         <el-col :span="8">
                             <el-button type="text"
-                                       icon="el-icon-edit"
+                                       icon="el-icon-delete"
                                        style="font-size: 18px;padding: 0px;"
                                        title="删除"
-                                       @click="removeGradeScore(scope.row)">
+                                       @click="removeGradeScore(scope.row.gsId)">
                             </el-button>
                         </el-col>
                     </el-row>
@@ -252,13 +254,31 @@
                 })
             },
             addGradeScore(){
-
+                window.location.href = 'score-add';
             },
             editGradeScore(obj){
                 window.location.href = 'voucherInventoryItems-edit?'+Qs.stringify(obj);
             },
-            removeGradeScore(){
-                window.location.href = 'add-voucherInventory';
+            removeGradeScore(gsId){
+                axios({
+                    method:'post',
+                    url:'score/removeScore/'+gsId,
+                }).then(res => {
+                    if(res.data.code == 1){
+                        this.$message({
+                            showClose: true,
+                            message: '刪除成功',
+                            type: 'success'
+                        });
+                        this.getGradeScoreList();
+                    }else{
+                        this.$message({
+                            showClose: true,
+                            message:'刪除失败',
+                            type: 'error'
+                        });
+                    }
+                })
             }
         }
     });

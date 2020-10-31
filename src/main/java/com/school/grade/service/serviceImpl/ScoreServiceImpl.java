@@ -7,6 +7,8 @@ import com.school.grade.service.ScoreService;
 import com.school.grade.utils.BaseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -48,14 +50,6 @@ public class ScoreServiceImpl implements ScoreService {
         return map;
     }
 
-//    @Override
-//    public Map<String, Object> getGradeUser(Integer userId) {
-//        Map<String, Object> result = new HashMap<String, Object>();
-//        result.put("code",1);
-//        result.put("info",gradeUserMapper.selectGradeUserById(userId));
-//        return result;
-//    }
-
     @Override
     public Map<String, Object> getGradeScoreList(GetGradeScoreListParam param) {
         Map<String, Object> result = new HashMap<String, Object>();
@@ -73,13 +67,31 @@ public class ScoreServiceImpl implements ScoreService {
         return result;
     }
 
-//    @Override
-//    public Map<String, Object> removeUser(Integer userId) {
-//        Map<String, Object> result = new HashMap<String, Object>();
-//        gradeUserMapper.deleteGradeUser(userId);
-//        result.put("code",1);
-//        return result;
-//    }
+    @Override
+    @Transactional
+    public Map<String, Object> addGradeScore(List<GradeScore> list) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        int count = 0;
+        for (int i = 0; i < list.size(); i++) {
+            if(gradeScoreMapper
+                    .selectScoreByStudentId(list.get(i).getWeekNumber(),list.get(i).getStudentId()) == null){
+                gradeScoreMapper.insertGradeScore(list.get(i));
+            }else{
+                count++;
+            }
+        }
+        result.put("code",1);
+        result.put("count",count);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> removeScore(Integer gsId) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        gradeScoreMapper.deleteGradeScore(gsId);
+        result.put("code",1);
+        return result;
+    }
 //
 //    @Override
 //    public Map<String, Object> addGradeUser(GradeUser user) {
@@ -90,19 +102,6 @@ public class ScoreServiceImpl implements ScoreService {
 //            user.setAccountPassword(null);
 //        }
 //        gradeUserMapper.insertGradeUser(user);
-//        result.put("code",1);
-//        return result;
-//    }
-//
-//    @Override
-//    public Map<String, Object> updateGradeUser(GradeUser user) {
-//        Map<String, Object> result = new HashMap<String, Object>();
-//        if(user.getAccountPassword() != null && user.getAccountPassword().length() > 0){
-//            user.setAccountPassword(MD5.getMD5Str(user.getAccountPassword()));
-//        }else{
-//            user.setAccountPassword(null);
-//        }
-//        gradeUserMapper.updateGradeUserInfo(user);
 //        result.put("code",1);
 //        return result;
 //    }

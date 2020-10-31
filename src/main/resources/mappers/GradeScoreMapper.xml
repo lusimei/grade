@@ -14,6 +14,7 @@
         <result column="SPORTS_SCORE" property="sportsScore"/>
         <result column="ENTERTAINMENT_SCORE" property="entertainmentScore"/>
         <result column="PEACETIME_SCORE" property="peacetimeScore"/>
+        <result column="AVG_SCORE" property="avgScore"/>
         <result column="COMMENTS" property="comments"/>
         <result column="CREATE_TIME" property="createTime"/>
         <result column="UPDATE_TIME" property="updateTime"/>
@@ -30,6 +31,7 @@
         SPORTS_SCORE,
         ENTERTAINMENT_SCORE,
         PEACETIME_SCORE,
+        AVG_SCORE,
         COMMENTS,
         CREATE_TIME,
         UPDATE_TIME
@@ -62,6 +64,17 @@
         ORDER BY CREATE_TIME DESC
     </select>
 
+    <select id="selectScoreByStudentId" resultMap="BaseResultMap">
+        SELECT
+            *
+        FROM
+            grade_score
+        WHERE
+            STUDENT_ID = #{studentId}
+        AND
+            WEEK_NUMBER = #{weekNumber}
+    </select>
+
     <update id="updateGradeScore">
         UPDATE
             grade_score
@@ -84,12 +97,19 @@
             <if test="peacetimeScore != null">
                 PEACETIME_SCORE = #{peacetimeScore,jdbcType=REAL},
             </if>
+            <if test="avgScore != null">
+                AVG_SCORE = #{avgScore,jdbcType=REAL},
+            </if>
             <if test="comments != null">
                 COMMENTS = #{comments,jdbcType=VARCHAR},
             </if>
         </set>
         WHERE GS_ID = #{gsId}
     </update>
+
+    <delete id="deleteGradeScore">
+        DELETE FROM grade_score WHERE GS_ID = #{gsId}
+    </delete>
 
     <insert id="insertGradeScore">
         INSERT INTO grade_score
@@ -123,6 +143,9 @@
             </if>
             <if test="peacetimeScore != null">
                 PEACETIME_SCORE,
+            </if>
+            <if test="avgScore != null">
+                AVG_SCORE,
             </if>
             <if test="comments != null">
                 COMMENTS,
@@ -164,6 +187,9 @@
             </if>
             <if test="peacetimeScore != null">
                 #{peacetimeScore,jdbcType=REAL},
+            </if>
+            <if test="avgScore != null">
+                #{avgScore,jdbcType=REAL},
             </if>
             <if test="comments != null">
                 #{comments,jdbcType=VARCHAR},

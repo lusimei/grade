@@ -43,4 +43,22 @@ public class ScoreController {
         return scoreService.getGradeScoreList(param);
     }
 
+    /**
+     * 添加评分列表
+     */
+    @RequestMapping(value = "addGradeScore", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> addGradeScore(@RequestBody List<GradeScore> list) {
+        return scoreService.addGradeScore(list);
+    }
+
+    /**
+     * 删除评分
+     */
+    @RequestMapping(value = "removeScore/{gsId}", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> removeScore(@PathVariable("gsId") Integer gsId) {
+        return scoreService.removeScore(gsId);
+    }
+
 }

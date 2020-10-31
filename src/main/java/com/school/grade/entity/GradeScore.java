@@ -58,6 +58,10 @@ public class GradeScore {
      */
     private Float peacetimeScore;
     /**
+     * 总平均分
+     */
+    private Float avgScore;
+    /**
      * 备注
      */
     private String comments;

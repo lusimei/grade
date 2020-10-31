@@ -1,0 +1,429 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="Bookmark" href="/favicon.ico">
+    <link rel="Shortcut Icon" href="/favicon.ico"/>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui/css/H-ui.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/H-ui.admin.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/skin/default/skin.css}" } id="skin"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/style.css}"/>
+    <!--本页面表格使用vue element-ui样式-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vue/element-ui/index.css}">
+    <!--[if IE 6]>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <style>
+        .el-table td, .el-table th{
+            padding:3px 0;
+        }
+        .buttionClass{
+            margin-left: 20px;
+            font-size: 16px;
+            padding: 6px;
+        }
+        .inputClass{
+            max-width: 65%;
+        }
+    </style>
+    <title>添加评分</title>
+</head>
+<body>
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i> 首頁
+    <span class="c-gray en">&gt;</span>评分管理 <span class="c-gray en">&gt;</span>
+    <a href="score-list" class="maincolor adminhidden">评分列表</a>
+    <span class="c-gray en">&gt;</span> 添加评分
+</nav>
+<div class="page-container" id="app">
+    <el-form :model="ruleForm" status-icon  :rules="rules" ref="ruleForm"
+             label-width="100px"  class="demo-ruleForm">
+        <el-form-item>
+            <el-row>
+                <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
+                    <el-form-item label="教师"  prop="teacherId">
+                        <el-select v-model="ruleForm.teacherId" placeholder="请选择教师">
+                            <el-option
+                                    v-for="item in teacherList"
+                                    :key="item.userId"
+                                    :label="item.userName"
+                                    :value="item.userId">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
+                    <el-form-item label="学生"  prop="studentId">
+                        <el-select v-model="ruleForm.studentId" placeholder="请选择学生">
+                            <el-option
+                                    v-for="item in studentList"
+                                    :key="item.userId"
+                                    :label="item.userName"
+                                    :value="item.userId">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
+                    <el-form-item label="标准周" prop="weekNumber">
+                        <el-select v-model="ruleForm.weekNumber" placeholder="请选择">
+                            <el-option
+                                    v-for="item in weekList"
+                                    :key="item.id"
+                                    :label="item.date"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form-item>
+        <el-form-item>
+            <el-row>
+                <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
+                    <el-form-item label="纪律分" prop="disciplineScore">
+                        <el-input class="inputClass" v-model="ruleForm.disciplineScore"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
+                    <el-form-item label="学习分" prop="studyScore">
+                        <el-input class="inputClass" v-model="ruleForm.studyScore"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form-item>
+        <el-form-item>
+            <el-row>
+                <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
+                    <el-form-item label="卫生分" prop="healthScore">
+                        <el-input class="inputClass" v-model="ruleForm.healthScore"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
+                    <el-form-item label="体育分" prop="sportsScore">
+                        <el-input class="inputClass" v-model="ruleForm.sportsScore"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form-item>
+        <el-form-item>
+            <el-row>
+                <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
+                    <el-form-item label="文娱分" prop="entertainmentScore">
+                        <el-input class="inputClass" v-model="ruleForm.entertainmentScore"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
+                    <el-form-item label="平时表现分" prop="peacetimeScore">
+                        <el-input class="inputClass" v-model="ruleForm.peacetimeScore"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form-item>
+        <el-form-item>
+            <el-row>
+                <el-col :xs="16" :sm="16" :md="16" :lg="16" :xl="16">
+                    <el-form-item label="备注" prop="comments">
+                        <el-input
+                                placeholder="请输入备注"
+                                v-model="ruleForm.comments"
+                                maxlength="200"
+                                show-word-limit>
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :xs="3" :sm="3" :md="3" :lg="3" :xl="3">
+                    <el-button type="success" @click="addInfoToTable('ruleForm')" size="small" class="buttionClass">
+                        <i class="el-icon-plus"></i>添加
+                    </el-button>
+                </el-col>
+            </el-row>
+        </el-form-item>
+        <el-form-item label="已添加">
+            <el-table
+                    :header-cell-style="{background:'#F5F7FA',color:'#606266','text-align':'center'}"
+                    :data="tableData"
+                    :cell-style="{'text-align':'center'}"
+                    :height="tableHeight"
+                    border>
+                <el-table-column
+                        width="110"
+                        prop="teacherName"
+                        label="教师名称">
+                </el-table-column>
+                <el-table-column
+                        width="110"
+                        prop="studentName"
+                        label="学生名称">
+                </el-table-column>
+                <el-table-column
+                        width="110"
+                        prop="weekNumber"
+                        label="国际标准周">
+                </el-table-column>
+                <el-table-column
+                        prop="disciplineScore"
+                        label="纪律分">
+                </el-table-column>
+                <el-table-column
+                        prop="studyScore"
+                        label="学习分">
+                </el-table-column>
+                <el-table-column
+                        prop="healthScore"
+                        label="卫生分">
+                </el-table-column>
+                <el-table-column
+                        prop="sportsScore"
+                        label="体育分">
+                </el-table-column>
+                <el-table-column
+                        prop="entertainmentScore"
+                        label="文娱分">
+                </el-table-column>
+                <el-table-column
+                        width="110"
+                        prop="peacetimeScore"
+                        label="平时表现分">
+                </el-table-column>
+                <el-table-column
+                        width="90"
+                        prop="avgScore"
+                        label="总平均分">
+                </el-table-column>
+                <el-table-column
+                        width="250"
+                        prop="comments"
+                        label="备注">
+                </el-table-column>
+                <el-table-column
+                        width="70"
+                        align="center"
+                        label="操作">
+                    <template slot-scope="scope">
+                        <el-row type="flex" class="row-bg" justify="center">
+                            <el-col :span="24">
+                                <el-button type="text"
+                                           icon="el-icon-delete"
+                                           style="font-size: 18px;padding: 0px;"
+                                           title="刪除"
+                                           @click="removeInfoForTable(scope.row)">
+                                </el-button>
+                            </el-col>
+                        </el-row>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-form-item>
+        <el-table-column style="text-align: center;">
+            <el-button type="success" @click="submitAdd('ruleForm')" size="medium" :disabled="isDisable">
+                提交
+            </el-button>
+        </el-table-column>
+    </el-form>
+</div>
+<script type="text/javascript" th:src="@{/moment/moment.min.js}"></script>
+<!--本页面表格使用vue.js-->
+<script type="text/javascript" th:src="@{/vue/vue.min.js}"></script>
+<script type="text/javascript" th:src="@{/vue/qs/qs.js}"></script>
+<script type="text/javascript" th:src="@{/vue/element-ui/index.js}"></script>
+<script type="text/javascript"  th:src="@{/vue/axios/axios.min.js}"></script>
+<script type="text/javascript">
+
+    new Vue({
+        el: '#app',
+        data() {
+            let checkNumber = (rule, value, callback) => {
+                if (value.length == 0) {
+                    callback(new Error('分数不能为空'));
+                }
+                if (/^\d+(\.\d{1})?$/.test(value)) {
+                    if (Number(value) < 0 || Number(value) > 100) {
+                        callback(new Error('请输入0-100的数'));
+                    } else {
+                        callback();
+                    }
+                } else {
+                    callback(new Error('请输入保留0-1位小数数字值'));
+                }
+            };
+            return {
+                ruleForm: {
+                    teacherId:'',
+                    teacherName:'',
+                    studentId:'',
+                    studentName:'',
+                    weekNumber:'',
+                    disciplineScore:'',
+                    studyScore: '',
+                    healthScore: '',
+                    sportsScore: '',
+                    entertainmentScore:'',
+                    peacetimeScore:'',
+                    comments:''
+                },
+                tableHeight:0,
+                teacherList:[],
+                studentList:[],
+                weekList:[],
+                tableData:[],
+                accountType:'',
+                isDisable:false,
+                rules: {
+                    teacherId:[
+                        { required: true, message: '请选择教师', trigger: 'change' }
+                    ],
+                    studentId:[
+                        { required: true, message: '请选择学生', trigger: 'change' }
+                    ],
+                    weekNumber:[
+                        { required: true, message: '请选择标准周', trigger: 'change' }
+                    ],
+                    disciplineScore:[
+                        {validator: checkNumber, trigger: 'blur' }
+                    ],
+                    studyScore:[
+                        {validator: checkNumber, trigger: 'blur' }
+                    ],
+                    healthScore:[
+                        {validator: checkNumber, trigger: 'blur' }
+                    ],
+                    sportsScore:[
+                        {validator: checkNumber, trigger: 'blur' }
+                    ],
+                    entertainmentScore:[
+                        {validator: checkNumber, trigger: 'blur' }
+                    ],
+                    peacetimeScore:[
+                        {validator: checkNumber, trigger: 'blur' }
+                    ]
+                }
+            }
+        },
+        mounted(){
+            this.$nextTick(() => {
+                this.tableHeight = window.innerHeight - 500;
+            })
+            this.accountType = this.getCookie('accountType');
+            axios({
+                method: 'post',
+                url: 'user/getTeacherAndStudentList'
+            }).then(res => {
+                if (res.data.code == 1) {
+                    this.teacherList = res.data.teacherList;
+                    this.studentList = res.data.studentList;
+                }
+            })
+            axios({
+                method:'get',
+                url:'score/getWeekByYear'
+            }).then(res => {
+                this.weekList = res.data.list
+            })
+        },
+        methods:{
+            getCookie(name) {
+                var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+                if (arr = document.cookie.match(reg))
+                    return decodeURI(arr[2]);
+                else
+                    return null;
+            },
+            addInfoToTable(formName){
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        if(this.tableData.length > 0){
+                            if(this.tableData.find(item => this.ruleForm.teacherId == item.teacherId
+                                && this.ruleForm.studentId == item.studentId)){
+                                this.$message({
+                                    showClose: true,
+                                    message: '不能重複添加',
+                                    type: 'warning'
+                                });
+                                return;
+                            }
+                        }
+                        let teacher = this.teacherList.find(item => this.ruleForm.teacherId == item.userId);
+                        let student = this.studentList.find(item => this.ruleForm.studentId == item.userId);
+                        let score = {
+                            teacherId:teacher.userId,
+                            teacherName:teacher.userName,
+                            studentId:student.userId,
+                            studentName:student.userName,
+                            weekNumber: this.ruleForm.weekNumber,
+                            disciplineScore: this.ruleForm.disciplineScore,
+                            studyScore: this.ruleForm.studyScore,
+                            healthScore: this.ruleForm.healthScore,
+                            sportsScore: this.ruleForm.sportsScore,
+                            entertainmentScore: this.ruleForm.entertainmentScore,
+                            peacetimeScore: this.ruleForm.peacetimeScore,
+                            avgScore: this.getAvgScore(this.ruleForm.disciplineScore,this.ruleForm.studyScore,
+                                this.ruleForm.healthScore,this.ruleForm.sportsScore,this.ruleForm.entertainmentScore,
+                                this.ruleForm.peacetimeScore),
+                            comments: this.ruleForm.comments,
+                        }
+                        this.tableData.push(score);
+                    } else {
+                        return false;
+                    }
+                })
+            },
+            getAvgScore(disciplineScore,studyScore,healthScore,sportsScore,entertainmentScore,peacetimeScore){
+                var avg = Number(disciplineScore)+Number(studyScore)+Number(healthScore)
+                    +Number(sportsScore)+Number(entertainmentScore)+Number(peacetimeScore);
+                return Number(avg/6).toFixed(1);
+            },
+            removeInfoForTable(obj){
+                this.tableData = this.tableData.filter(item => item.teacherId !== obj.teacherId
+                    || item.studentId !== obj.studentId );
+            },
+            submitAdd(formName){
+                if(this.tableData.length <= 0){//如果没有选择一行数据则不允许提交
+                    this.$message({
+                        showClose: true,
+                        message: '請確保表格至少有一條數據',
+                        type: 'warning'
+                    });
+                    return;
+                }
+                this.isDisable = true;//禁用提交按钮
+                axios({
+                    method: 'post',
+                    url: 'score/addGradeScore',
+                    data: this.tableData
+                }).then(res => {
+                    if (res.data.code == 1) {
+                        let message = '添加评分成功';
+                        if(res.data.count > 0){
+                            message = '添加评分成功,有'+res.data.count+'条数据已存在';
+                        }
+                        this.$message({
+                            showClose: true,
+                            message: message,
+                            type: 'success'
+                        });
+                        setTimeout(() =>{window.location.href = 'score-list';},1500)
+                    } else {
+                        this.$message({
+                            showClose: true,
+                            message: '添加评分失敗',
+                            type: 'error'
+                        });
+                    }
+                })
+            }
+        }
+    });
+</script>
+</body>
+</html>
