@@ -24,6 +24,9 @@
     <script>DD_belatedPNG.fix('*');</script>
     <![endif]-->
     <style>
+        .input{
+            width: 220px;
+        }
         .el-table td, .el-table th{
             padding:3px 0;
         }
@@ -40,6 +43,10 @@
     <i class="Hui-iconfont">&#xe67f;</i> 首頁
     <span class="c-gray en">&gt;</span>评分管理
     <span class="c-gray en">&gt;</span>评分列表
+    <a class="btn btn-success radius r" style="line-height: 1.6em; margin-top: 3px;margin-right: 20px;"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="Hui-iconfont">&#xe68f;</i>
+    </a>
 </nav>
 <div class="page-container" id="app">
     <el-row>
@@ -49,32 +56,32 @@
                     placeholder="請輸入老师姓名"
                     v-model.lazy="teacherName"
                     clearable
-                    @keyup.enter.native="getGradeRelationList">
+                    @keyup.enter.native="getGradeScoreList">
             </el-input>
             <el-input
                     class="input"
                     placeholder="請輸入学生姓名"
                     v-model.lazy="studentName"
                     clearable
-                    @keyup.enter.native="getGradeRelationList">
+                    @keyup.enter.native="getGradeScoreList">
             </el-input>
             标准周:
-            <el-select v-model="wiId" placeholder="请选择" class="selectClass">
+            <el-select v-model="weekNumber" placeholder="请选择">
                 <el-option
-                        v-for="item in warehouseList"
-                        :key="item.wiId"
-                        :label="item.wiName"
-                        :value="item.wiId">
+                        v-for="item in weekList"
+                        :key="item.id"
+                        :label="item.date"
+                        :value="item.id">
                 </el-option>
             </el-select>
-            <el-button @Click="getWarehouseVoucherInventoryList"
+            <el-button @Click="getGradeScoreList"
                        type="primary"
                        class="buttionClass"
                        size="small"
                        :loading="isLoading">
                 查询
             </el-button>
-            <el-button type="primary" @click="addVoucherInventory" size="small" class="buttionClass">
+            <el-button type="primary" @click="addGradeScore" size="small" class="buttionClass">
                 <i class="el-icon-plus"></i>添加评分
             </el-button>
         </el-col>
@@ -156,7 +163,7 @@
                                        icon="el-icon-edit"
                                        style="font-size: 18px;padding: 0px;"
                                        title="修改"
-                                       @click="editVoucherInventoryItems(scope.row)">
+                                       @click="editGradeScore(scope.row)">
                             </el-button>
                         </el-col>
                         <el-col :span="8">
@@ -164,7 +171,7 @@
                                        icon="el-icon-edit"
                                        style="font-size: 18px;padding: 0px;"
                                        title="删除"
-                                       @click="editVoucherInventoryItems(scope.row)">
+                                       @click="removeGradeScore(scope.row)">
                             </el-button>
                         </el-col>
                     </el-row>
@@ -186,53 +193,31 @@
         data: function() {
             return {
                 total:0,
-                wiId:'',
+                weekNumber:'',
+                teacherName:'',
+                studentName:'',
                 pageSize:60,
                 currentPage:1,
                 tableHeight:0,
-                warehouseList:[],
+                weekList:[],
                 tableData:[],
-                isLoading:false,
-                pickerOptions: {
-                    shortcuts: [{
-                        text: '本月',
-                        onClick(picker) {
-                            picker.$emit('pick', [new Date(), new Date()]);
-                        }
-                    }, {
-                        text: '今年至今',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date(new Date().getFullYear(), 0);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近六个月',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setMonth(start.getMonth() - 6);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }]
-                },
-                dates:[]
+                isLoading:false
             }
         },
         mounted(){
             this.$nextTick(() => {
-                this.tableHeight = window.innerHeight - 180;
+                this.tableHeight = window.innerHeight-180;
             })
-            this.getWarehouseVoucherInventoryList()
+            this.getGradeScoreList()
             axios({
-                method:'post',
-                url:weburl + 'getWareHouseInfo'
+                method:'get',
+                url:'score/getWeekByYear'
             }).then(res => {
-                this.warehouseList = res.data.list
+                this.weekList = res.data.list
             })
         },
         methods:{
-            getWarehouseVoucherInventoryList(){
+            getGradeScoreList(){
                 this.isLoading = true;
                 this.currentPage = 1;
                 this.getData();
@@ -245,27 +230,20 @@
                 if(date == undefined){
                     return "";
                 }else {
-                    return moment(date).format("DD/MM/yyyy");
+                    return moment(date).format("YYYY-MM-DD HH:mm:ss");
                 }
             },
             getData(){
-                let start = '';
-                let end = '';
-                if(this.dates != undefined && this.dates.length > 0){
-                    start = moment(this.dates[0]).format("yyyy-MM-DD");
-                    end = moment(this.dates[1]).format("yyyy-MM-DD");
-                }
                 let param = {
-                    startDate:start,
-                    endDate:end,
+                    weekNumber:this.weekNumber,
+                    teacherName:this.teacherName,
+                    studentName:this.studentName,
                     currentPage:this.currentPage,
-                    pageSize:this.pageSize,
-                    wiId:this.wiId,
-                    appId:1
+                    pageSize:this.pageSize
                 };
                 axios({
                     method:'get',
-                    url:weburl+'getVoucherInventoryList',
+                    url:'score/getGradeScoreList',
                     params:param
                 }).then(res => {
                     this.tableData = res.data.page.list
@@ -273,10 +251,13 @@
                     this.isLoading = false
                 })
             },
-            editVoucherInventoryItems(obj){
+            addGradeScore(){
+
+            },
+            editGradeScore(obj){
                 window.location.href = 'voucherInventoryItems-edit?'+Qs.stringify(obj);
             },
-            addVoucherInventory(){
+            removeGradeScore(){
                 window.location.href = 'add-voucherInventory';
             }
         }
