@@ -151,4 +151,13 @@ public class UserController {
     public Map<String, Object> getStudentList(@PathVariable("teacherId") Integer teacherId) {
         return userService.getStudentList(teacherId);
     }
+
+    /**
+     * 查询所有学生
+     */
+    @RequestMapping(value = "getAllStudentList", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> getAllStudentList() {
+        return userService.getAllStudentList();
+    }
 }

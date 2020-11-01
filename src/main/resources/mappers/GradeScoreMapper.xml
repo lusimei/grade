@@ -54,6 +54,9 @@
             <if test="weekNumber != null">
                 gs.WEEK_NUMBER = #{weekNumber}
             </if>
+            <if test="teacherId != null">
+                AND gs.TEACHER_ID = #{teacherId}
+            </if>
             <if test="teacherName != ''">
                 AND (t.USER_NAME LIKE #{teacherName} OR t.ACCOUNT_NUMBER LIKE #{teacherName})
             </if>
@@ -66,13 +69,21 @@
 
     <select id="selectScoreByStudentId" resultMap="BaseResultMap">
         SELECT
-            *
+            gs.*,s.USER_NAME AS STUDENT_NAME,t.USER_NAME AS TEACHER_NAME
         FROM
-            grade_score
+            grade_score gs
+        JOIN
+            grade_user t
+        ON
+            gs.TEACHER_ID = t.USER_ID
+        JOIN
+            grade_user s
+        ON
+            gs.STUDENT_ID = s.USER_ID
         WHERE
-            STUDENT_ID = #{studentId}
+            gs.STUDENT_ID = #{studentId}
         AND
-            WEEK_NUMBER = #{weekNumber}
+            gs.WEEK_NUMBER = #{weekNumber}
     </select>
 
     <update id="updateGradeScore">

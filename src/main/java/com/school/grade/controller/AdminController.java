@@ -60,4 +60,8 @@ public class AdminController {
         return "score-add";
     }
 
+    @RequestMapping("/personal-score")
+    public String personalScore() {
+        return "personal-score";
+    }
 }

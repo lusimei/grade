@@ -255,4 +255,12 @@ public class UserServiceImpl implements UserService {
         result.put("code",1);
         return result;
     }
+
+    @Override
+    public Map<String, Object> getAllStudentList() {
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("studentList",gradeUserMapper.selectAllStudent());
+        result.put("code",1);
+        return result;
+    }
 }

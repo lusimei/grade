@@ -1,0 +1,269 @@
+﻿<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="Bookmark" href="/favicon.ico">
+    <link rel="Shortcut Icon" href="/favicon.ico"/>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv.js"></script>
+    <script type="text/javascript" src="lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui/css/H-ui.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/H-ui.admin.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/Hui-iconfont/1.0.8/iconfont.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/skin/default/skin.css}" } id="skin"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/h-ui.admin/css/style.css}"/>
+    <!--本页面表格使用vue element-ui样式-->
+    <link rel="stylesheet" type="text/css" th:href="@{/vue/element-ui/index.css}">
+    <!--[if IE 6]>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <style>
+        .input{
+            width: 220px;
+        }
+        .el-table td, .el-table th{
+            padding:3px 0;
+        }
+        .buttionClass{
+            margin-left: 20px;
+            font-size: 16px;
+            padding: 6px;
+        }
+        .inputClass{
+            max-width: 80%;
+        }
+    </style>
+    <title>评分列表</title>
+</head>
+<body>
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i> 首頁
+    <span class="c-gray en">&gt;</span>评分管理
+    <span class="c-gray en">&gt;</span>评分列表
+    <a class="btn btn-success radius r" style="line-height: 1.6em; margin-top: 3px;margin-right: 20px;"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="Hui-iconfont">&#xe68f;</i>
+    </a>
+</nav>
+<div class="page-container" id="app">
+    <el-row>
+        <el-col :span="24" style="text-align: center;">
+            <span v-if="isShow">
+                学生:
+                <el-select v-model="studentId" placeholder="请选择学生">
+                    <el-option
+                            v-for="item in studentList"
+                            :key="item.userId"
+                            :label="item.userName"
+                            :value="item.userId">
+                    </el-option>
+                </el-select>
+            </span>
+            标准周:
+            <el-select v-model="weekNumber" placeholder="请选择">
+                <el-option
+                        v-for="item in weekList"
+                        :key="item.id"
+                        :label="item.date"
+                        :value="item.id">
+                </el-option>
+            </el-select>
+            <el-button @Click="getGradeScore"
+                       type="primary"
+                       class="buttionClass"
+                       size="small"
+                       :loading="isLoading">
+                查询
+            </el-button>
+        </el-col>
+    </el-row>
+    <el-table
+            :header-cell-style="{background:'#F5F7FA',color:'#606266','text-align':'center'}"
+            :data="tableData"
+            :cell-style="{'text-align':'center'}"
+            style="width: 100%;margin: 20px 0px;"
+            height="65px"
+            empty-text=" "
+            border>
+        <el-table-column
+                prop="teacherName"
+                label="教师名称">
+        </el-table-column>
+        <el-table-column
+                prop="studentName"
+                label="学生名称">
+        </el-table-column>
+        <el-table-column
+                prop="weekNumber"
+                label="标准周">
+        </el-table-column>
+        <el-table-column
+                prop="disciplineScore"
+                label="纪律分">
+        </el-table-column>
+        <el-table-column
+                prop="studyScore"
+                label="学习分">
+        </el-table-column>
+        <el-table-column
+                prop="healthScore"
+                label="卫生分">
+        </el-table-column>
+        <el-table-column
+                prop="sportsScore"
+                label="体育分">
+        </el-table-column>
+        <el-table-column
+                prop="entertainmentScore"
+                label="文娱分">
+        </el-table-column>
+        <el-table-column
+                prop="peacetimeScore"
+                label="平时表现分">
+        </el-table-column>
+        <el-table-column
+                width="90"
+                prop="avgScore"
+                label="总平均分">
+        </el-table-column>
+        <el-table-column
+                prop="comments"
+                label="备注">
+        </el-table-column>
+    </el-table>
+    <div style="width: 100%;text-align: center;display: flex;
+            justify-content: center;align-items: Center;padding-top: 100px;">
+        <div id="main" style="width: 50%;height:500px;"></div>
+    </div>
+</div>
+<script type="text/javascript" th:src="@{/moment/moment.min.js}"></script>
+<!--本页面图表表使用echarts.min.js-->
+<script type="text/javascript" th:src="@{/echarts/echarts.js}"></script>
+<!--本页面表格使用vue.js-->
+<script type="text/javascript" th:src="@{/vue/vue.min.js}"></script>
+<script type="text/javascript" th:src="@{/vue/qs/qs.js}"></script>
+<script type="text/javascript" th:src="@{/vue/element-ui/index.js}"></script>
+<script type="text/javascript"  th:src="@{/vue/axios/axios.min.js}"></script>
+<script type="text/javascript">
+
+    new Vue({
+        el: '#app',
+        data: function() {
+            return {
+                total:0,
+                weekNumber:'',
+                studentName:'',
+                studentId:'',
+                accountType:'',
+                teacherId:'',
+                weekList:[],
+                isShow:true,
+                studentList:[],
+                tableData:[],
+                isLoading:false,
+            }
+        },
+        mounted(){
+            this.accountType = this.getCookie('accountType');
+            axios({
+                method:'get',
+                url:'score/getWeekByYear'
+            }).then(res => {
+                this.weekList = res.data.list
+            })
+            this.weekNumber = String(moment().year()).substring(2)+moment().week();
+            if(this.accountType == 1){
+                axios({
+                    method: 'get',
+                    url: 'user/getAllStudentList'
+                }).then(res => {
+                    if (res.data.code == 1) {
+                        this.studentList = res.data.studentList;
+                    }
+                })
+            }else if(this.accountType == 2){
+                this.teacherId = Number(this.getCookie('clerkId'));
+                axios({
+                    method: 'get',
+                    url: 'user/getStudentList/'+this.teacherId
+                }).then(res => {
+                    if (res.data.code == 1) {
+                        this.studentList = res.data.studentList;
+                    }
+                })
+            }else if(this.accountType == 3){
+                this.studentId = Number(this.getCookie('clerkId'));
+                this.isShow = false;
+                this.getGradeScore()
+            }
+        },
+        methods:{
+            getGradeScore(){
+                this.isLoading = true;
+                this.getData();
+            },
+            getCookie(name) {
+                var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+                if (arr = document.cookie.match(reg))
+                    return decodeURI(arr[2]);
+                else
+                    return null;
+            },
+            getData(){
+                axios({
+                    method:'get',
+                    url:'score/getGradeScore/'+this.studentId,
+                    params:{weekNumber:this.weekNumber}
+                }).then(res => {
+                    if(res.data.code == 1){
+                        this.tableData = [];
+                        if(res.data.info){
+                            this.tableData.push(res.data.info);
+                            let score = res.data.info;
+                            var myChart = echarts.init(document.getElementById('main'));
+                            // 指定图表的配置项和数据
+                            var option = {
+                                title: {
+                                    text: '学生评分'
+                                },
+                                color: ['#3398DB','#3398DB','#3398DB','#3398DB','#3398DB','#3398DB','#00FF00'],
+                                tooltip: {
+                                    trigger: 'axis',
+                                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                                    }
+                                },
+                                legend: {
+                                    data:['评分']
+                                },
+                                xAxis: {
+                                    data: ["纪律分","学习分","卫生分","体育分","文娱分","平时表现分",'总平均分']
+                                },
+                                yAxis: {},
+                                series: [{
+                                    name: '销量',
+                                    type: 'bar',
+                                    data: [score.disciplineScore,score.studyScore,
+                                        score.healthScore,score.sportsScore,
+                                        score.entertainmentScore,score.peacetimeScore,score.avgScore]
+                                }]
+                            };
+
+                            // 使用刚指定的配置项和数据显示图表。
+                            myChart.setOption(option);
+                        }
+                        this.isLoading = false
+                    }
+                })
+            }
+        }
+    });
+</script>
+</body>
+</html>

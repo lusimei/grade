@@ -5,6 +5,7 @@ import com.school.grade.entity.*;
 import com.school.grade.mapper.*;
 import com.school.grade.service.ScoreService;
 import com.school.grade.utils.BaseUtils;
+import com.school.grade.utils.MD5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,18 +93,20 @@ public class ScoreServiceImpl implements ScoreService {
         result.put("code",1);
         return result;
     }
-//
-//    @Override
-//    public Map<String, Object> addGradeUser(GradeUser user) {
-//        Map<String, Object> result = new HashMap<String, Object>();
-//        if(user.getAccountPassword() != null && user.getAccountPassword().length() > 0){
-//            user.setAccountPassword(MD5.getMD5Str(user.getAccountPassword()));
-//        }else{
-//            user.setAccountPassword(null);
-//        }
-//        gradeUserMapper.insertGradeUser(user);
-//        result.put("code",1);
-//        return result;
-//    }
 
+    @Override
+    public Map<String, Object> updateGradeScore(GradeScore score) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        gradeScoreMapper.updateGradeScore(score);
+        result.put("code",1);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getGradeScore(Integer studentId,Integer weekNumber) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("code",1);
+        result.put("info",gradeScoreMapper.selectScoreByStudentId(weekNumber,studentId));
+        return result;
+    }
 }

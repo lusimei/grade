@@ -226,11 +226,11 @@
                 </el-table-column>
             </el-table>
         </el-form-item>
-        <el-table-column style="text-align: center;">
+        <el-form-item style="text-align: center;">
             <el-button type="success" @click="submitAdd('ruleForm')" size="medium" :disabled="isDisable">
                 提交
             </el-button>
-        </el-table-column>
+        </el-form-item>
     </el-form>
 </div>
 <script type="text/javascript" th:src="@{/moment/moment.min.js}"></script>
@@ -327,7 +327,7 @@
             this.accountType = this.getCookie('accountType');
             if(this.accountType == 2){
                 this.disabled = true;
-                this.ruleForm.teacherId = this.getCookie('clerkId');
+                this.ruleForm.teacherId = Number(this.getCookie('clerkId'));
                 this.getStudentListById();
             }
             axios({

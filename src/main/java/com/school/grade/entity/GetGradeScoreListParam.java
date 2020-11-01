@@ -26,4 +26,9 @@ public class GetGradeScoreListParam {
      * 国际标准周
      */
     private Integer weekNumber;
+    /**
+     * 教师ID
+     */
+    private Integer teacherId;
+
 }

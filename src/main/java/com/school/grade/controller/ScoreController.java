@@ -61,4 +61,23 @@ public class ScoreController {
         return scoreService.removeScore(gsId);
     }
 
+    /**
+     * 修改评分列表
+     */
+    @RequestMapping(value = "updateGradeScore", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> updateGradeScore(@RequestBody GradeScore score) {
+        return scoreService.updateGradeScore(score);
+    }
+
+    /**
+     * 查询评分列表
+     */
+    @RequestMapping(value = "getGradeScore/{studentId}", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> getGradeScore(@PathVariable("studentId")Integer studentId,
+                                             @RequestParam("weekNumber")Integer weekNumber) {
+        return scoreService.getGradeScore(studentId,weekNumber);
+    }
+
 }

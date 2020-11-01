@@ -38,4 +38,6 @@ public interface UserService {
     Map<String,Object> getTeacherList();
 
     Map<String,Object> getStudentList(Integer teacherId);
+
+    Map<String,Object> getAllStudentList();
 }
