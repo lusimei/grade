@@ -27,9 +27,6 @@
         .input{
             width: 220px;
         }
-        .el-table td, .el-table th{
-            padding:3px 0;
-        }
         .buttionClass{
             margin-left: 20px;
             font-size: 16px;
@@ -88,14 +85,16 @@
             :data="tableData"
             :cell-style="{'text-align':'center'}"
             style="width: 100%;margin: 20px 0px;"
-            height="65px"
+            :height="tableHeight"
             empty-text=" "
             border>
         <el-table-column
+                width="90"
                 prop="teacherName"
                 label="教师名称">
         </el-table-column>
         <el-table-column
+                width="90"
                 prop="studentName"
                 label="学生名称">
         </el-table-column>
@@ -124,6 +123,7 @@
                 label="文娱分">
         </el-table-column>
         <el-table-column
+                width="110"
                 prop="peacetimeScore"
                 label="平时表现分">
         </el-table-column>
@@ -137,10 +137,7 @@
                 label="备注">
         </el-table-column>
     </el-table>
-    <div style="width: 100%;text-align: center;display: flex;
-            justify-content: center;align-items: Center;padding-top: 100px;">
-        <div id="main" style="width: 50%;height:500px;"></div>
-    </div>
+    <div id="main" style="width: 40%;height:500px;position: absolute;top: 35%;left: 30%;right: 30%;"></div>
 </div>
 <script type="text/javascript" th:src="@{/moment/moment.min.js}"></script>
 <!--本页面图表表使用echarts.min.js-->
@@ -162,6 +159,7 @@
                 studentId:'',
                 accountType:'',
                 teacherId:'',
+                tableHeight:0,
                 weekList:[],
                 isShow:true,
                 studentList:[],
@@ -170,6 +168,9 @@
             }
         },
         mounted(){
+            this.$nextTick(() => {
+                this.tableHeight = window.innerHeight - 793;
+            })
             this.accountType = this.getCookie('accountType');
             axios({
                 method:'get',
@@ -232,7 +233,6 @@
                                 title: {
                                     text: '学生评分'
                                 },
-                                color: ['#3398DB','#3398DB','#3398DB','#3398DB','#3398DB','#3398DB','#00FF00'],
                                 tooltip: {
                                     trigger: 'axis',
                                     axisPointer: {            // 坐标轴指示器，坐标轴触发有效
@@ -240,23 +240,162 @@
                                     }
                                 },
                                 legend: {
-                                    data:['评分']
+                                    // data:["纪律分","学习分","卫生分","体育分","文娱分","平时表现分",'总平均分']
                                 },
                                 xAxis: {
                                     data: ["纪律分","学习分","卫生分","体育分","文娱分","平时表现分",'总平均分']
                                 },
                                 yAxis: {},
                                 series: [{
-                                    name: '销量',
+                                    name: '评分',
                                     type: 'bar',
                                     data: [score.disciplineScore,score.studyScore,
                                         score.healthScore,score.sportsScore,
-                                        score.entertainmentScore,score.peacetimeScore,score.avgScore]
+                                        score.entertainmentScore,score.peacetimeScore,score.avgScore],
+                                    itemStyle: {
+                                        //通常情况下：
+                                        normal:{
+                                            //每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
+                                            color: function (params){
+                                                var colorList = ['rgb(164,205,238)','rgb(42,170,227)','rgb(25,46,94)','rgb(195,229,235)'
+                                                ,'rgb(64,158,255)','rgb(94,185,94)','rgb(243,29,29)'];
+                                                return colorList[params.dataIndex];
+                                            }
+                                        },
+                                        //鼠标悬停时：
+                                        emphasis: {
+                                            shadowBlur: 10,
+                                            shadowOffsetX: 0,
+                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                        }
+                                    }
+                                //     ,{
+                                //          name: '纪律分',
+                                //          type: 'bar',
+                                //          data: [score.disciplineScore],
+                                //          itemStyle: {
+                                //              //通常情况下：
+                                //              normal:{
+                                //                  color:'rgb(164,205,238)'
+                                //              },
+                                //              //鼠标悬停时：
+                                //              emphasis: {
+                                //                  shadowBlur: 10,
+                                //                  shadowOffsetX: 0,
+                                //                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                //              }
+                                //          }
+                                //      },
+                                //     {
+                                //         name: '学习分',
+                                //         type: 'bar',
+                                //         data: [score.studyScore],
+                                //         itemStyle: {
+                                //             //通常情况下：
+                                //             normal:{
+                                //                 color:'rgb(42,170,227)'
+                                //             },
+                                //             //鼠标悬停时：
+                                //             emphasis: {
+                                //                 shadowBlur: 10,
+                                //                 shadowOffsetX: 0,
+                                //                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                //             }
+                                //         }
+                                //     },
+                                //     {
+                                //         name: '卫生分',
+                                //         type: 'bar',
+                                //         data: [score.healthScore],
+                                //         itemStyle: {
+                                //             //通常情况下：
+                                //             normal:{
+                                //                 color:'rgb(25,46,94)'
+                                //             },
+                                //             //鼠标悬停时：
+                                //             emphasis: {
+                                //                 shadowBlur: 10,
+                                //                 shadowOffsetX: 0,
+                                //                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                //             }
+                                //         }
+                                //     },
+                                //     {
+                                //         name: '体育分',
+                                //         type: 'bar',
+                                //         data: [score.sportsScore],
+                                //         itemStyle: {
+                                //             //通常情况下：
+                                //             normal:{
+                                //                 color:'rgb(195,229,235)'
+                                //             },
+                                //             //鼠标悬停时：
+                                //             emphasis: {
+                                //                 shadowBlur: 10,
+                                //                 shadowOffsetX: 0,
+                                //                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                //             }
+                                //         }
+                                //     },
+                                //     {
+                                //         name: '文娱分',
+                                //         type: 'bar',
+                                //         data: [score.entertainmentScore],
+                                //         itemStyle: {
+                                //             //通常情况下：
+                                //             normal:{
+                                //                 color:'rgb(64,158,255)'
+                                //             },
+                                //             //鼠标悬停时：
+                                //             emphasis: {
+                                //                 shadowBlur: 10,
+                                //                 shadowOffsetX: 0,
+                                //                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                //             }
+                                //         }
+                                //     },
+                                //     {
+                                //         name: '平时表现分',
+                                //         type: 'bar',
+                                //         data: [score.peacetimeScore],
+                                //         itemStyle: {
+                                //             //通常情况下：
+                                //             normal:{
+                                //                 color:'rgb(94,185,94)'
+                                //             },
+                                //             //鼠标悬停时：
+                                //             emphasis: {
+                                //                 shadowBlur: 10,
+                                //                 shadowOffsetX: 0,
+                                //                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                //             }
+                                //         }
+                                //     },
+                                //     {
+                                //         name: '总平均分',
+                                //         type: 'bar',
+                                //         data: [score.avgScore],
+                                //         itemStyle: {
+                                //             //通常情况下：
+                                //             normal:{
+                                //                 color:'rgb(243,29,29)'
+                                //             },
+                                //             //鼠标悬停时：
+                                //             emphasis: {
+                                //                 shadowBlur: 10,
+                                //                 shadowOffsetX: 0,
+                                //                 shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                //             }
+                                //         }
+                                //     }
                                 }]
                             };
 
                             // 使用刚指定的配置项和数据显示图表。
                             myChart.setOption(option);
+                            window.addEventListener("resize",function(){
+                                myChart.resize();
+                            });
                         }
                         this.isLoading = false
                     }
