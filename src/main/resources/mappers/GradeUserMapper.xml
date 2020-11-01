@@ -80,6 +80,23 @@
         </where>
     </select>
 
+    <select id="selectStudentListById" resultMap="BaseResultMap">
+        SELECT
+            s.USER_ID,s.USER_NAME
+        FROM
+            grade_user s
+        JOIN
+            grade_relation r
+        ON
+            s.USER_ID = r.STUDENT_ID
+        WHERE
+            r.TEACHER_ID = #{teacherId}
+        AND
+            s.STATUS = 1
+        AND
+            s.ACCOUNT_TYPE = 3
+    </select>
+
     <select id="selectStudentList" resultMap="BaseResultMap">
         SELECT
         USER_ID,USER_NAME

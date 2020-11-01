@@ -239,4 +239,20 @@ public class UserServiceImpl implements UserService {
         result.put("count",count);
         return result;
     }
+
+    @Override
+    public Map<String, Object> getTeacherList() {
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("teacherList",gradeUserMapper.selectTeacherList());
+        result.put("code",1);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getStudentList(Integer teacherId) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("studentList",gradeUserMapper.selectStudentListById(teacherId));
+        result.put("code",1);
+        return result;
+    }
 }

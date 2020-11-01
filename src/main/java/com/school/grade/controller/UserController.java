@@ -133,4 +133,22 @@ public class UserController {
     public Map<String, Object> addGradeRelation(@RequestBody List<GradeRelation> list) {
         return userService.addGradeRelation(list);
     }
+
+    /**
+     * 查询教师列表
+     */
+    @RequestMapping(value = "getTeacherList", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> getTeacherList() {
+        return userService.getTeacherList();
+    }
+
+    /**
+     * 根据教师ID查询学生列表
+     */
+    @RequestMapping(value = "getStudentList/{teacherId}", produces = "application/json; charset=utf-8")
+    @ResponseBody
+    public Map<String, Object> getStudentList(@PathVariable("teacherId") Integer teacherId) {
+        return userService.getStudentList(teacherId);
+    }
 }

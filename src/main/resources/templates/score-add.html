@@ -46,13 +46,14 @@
     <span class="c-gray en">&gt;</span> 添加评分
 </nav>
 <div class="page-container" id="app">
-    <el-form :model="ruleForm" status-icon  :rules="rules" ref="ruleForm"
+    <el-form :model="ruleForm"  :rules="rules" ref="ruleForm"
              label-width="100px"  class="demo-ruleForm">
         <el-form-item>
             <el-row>
                 <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="6">
                     <el-form-item label="教师"  prop="teacherId">
-                        <el-select v-model="ruleForm.teacherId" placeholder="请选择教师">
+                        <el-select v-model="ruleForm.teacherId" placeholder="请选择教师"
+                                   :disabled="disabled"    @change="getStudentListById">
                             <el-option
                                     v-for="item in teacherList"
                                     :key="item.userId"
@@ -278,6 +279,7 @@
                 weekList:[],
                 tableData:[],
                 accountType:'',
+                disabled:false,
                 isDisable:false,
                 rules: {
                     teacherId:[
@@ -314,16 +316,20 @@
             this.$nextTick(() => {
                 this.tableHeight = window.innerHeight - 500;
             })
-            this.accountType = this.getCookie('accountType');
             axios({
-                method: 'post',
-                url: 'user/getTeacherAndStudentList'
+                method: 'get',
+                url: 'user/getTeacherList'
             }).then(res => {
                 if (res.data.code == 1) {
                     this.teacherList = res.data.teacherList;
-                    this.studentList = res.data.studentList;
                 }
             })
+            this.accountType = this.getCookie('accountType');
+            if(this.accountType == 2){
+                this.disabled = true;
+                this.ruleForm.teacherId = this.getCookie('clerkId');
+                this.getStudentListById();
+            }
             axios({
                 method:'get',
                 url:'score/getWeekByYear'
@@ -338,6 +344,16 @@
                     return decodeURI(arr[2]);
                 else
                     return null;
+            },
+            getStudentListById(){
+                axios({
+                    method: 'get',
+                    url: 'user/getStudentList/'+this.ruleForm.teacherId
+                }).then(res => {
+                    if (res.data.code == 1) {
+                        this.studentList = res.data.studentList;
+                    }
+                })
             },
             addInfoToTable(formName){
                 this.$refs[formName].validate((valid) => {

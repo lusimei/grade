@@ -25,4 +25,7 @@ public interface GradeUserMapper {
     List<GradeUser> selectTeacherList();
 
     List<GradeUser> selectStudentList();
+
+    List<GradeUser> selectStudentListById(Integer teacherId);
+
 }

@@ -34,4 +34,8 @@ public interface UserService {
     Map<String,Object> getTeacherAndStudentList();
 
     Map<String,Object> addGradeRelation(List<GradeRelation> list);
+
+    Map<String,Object> getTeacherList();
+
+    Map<String,Object> getStudentList(Integer teacherId);
 }
