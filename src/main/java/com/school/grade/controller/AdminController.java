@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,15 +21,22 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class AdminController {
 
-    @RequestMapping("/index")
-    public String index() {
-        return "index";
+//    @RequestMapping("/index")
+//    public String index() {
+//        return "index";
+//    }
+
+//    @RequestMapping("/login")
+//    public String login() {
+//        return "login";
+//    }
+
+    @RequestMapping("/hello")
+    @ResponseBody
+    public String hello() {
+        return "welcome to grade";
     }
 
-    @RequestMapping("/login")
-    public String login() {
-        return "login";
-    }
 
     @RequestMapping("/welcome")
     public String welcome() {
