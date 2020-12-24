@@ -21,15 +21,10 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class AdminController {
 
-//    @RequestMapping("/index")
-//    public String index() {
-//        return "index";
-//    }
-
-//    @RequestMapping("/login")
-//    public String login() {
-//        return "login";
-//    }
+    @RequestMapping("/login")
+    public String login() {
+        return "login";
+    }
 
     @RequestMapping("/hello")
     @ResponseBody
